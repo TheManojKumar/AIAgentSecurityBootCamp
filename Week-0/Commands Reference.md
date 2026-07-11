@@ -6,13 +6,31 @@
 
 ---
 
-## Section 0 — Setup Runbook (do this once, in order)
+## Section 0 — Install pre-requisites
+
+### Windows (PowerShell)
+
+```powershell
+winget install python3                    # python to compile and run code
+winget install Docker.DockerDesktop       # to install and run containers
+winget install Ollama.Ollama              # models
+winget install Git.Git                    # optional if you want to create your own git repo
+winget install Microsoft.VisualStudioCode # will use it as our development environment
+```
+### Ubuntu (Bash)
+
+```bash
+sudo apt install python3                        # python to compile and run code
+sudo apt install docker.io                      # to install and run containers
+curl -fsSL https://ollama.com/install.sh | sh   # models
+sudo apt install git                            # optional if you want to create your own git repo
+sudo snap install code --classic                # will use it as our development environment
+```
+
+## Section 0 — Check if everything is working (do this once, in order, same for windows/linux)
 
 ```bash
 # 0.1 — Confirm Python 3.11+ and pip
-python3 --version            # need 3.11 or newer
-pip3 --version
-# if above command doesn't work then try this
 python --version            # need 3.11 or newer
 pip --version
 
@@ -85,7 +103,6 @@ rm file ; rm -r dir       # remove file / directory (careful)
 # Environment variables — how we select models and point at Ollama
 $env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
 echo $env:ORCHESTRATOR_MODEL             # read one back (or: Write-Output)
-$env:ORCHESTRATOR_MODEL="qwen2.5:3b"; some_cmd   # set just for this one command
 
 # Inspect what's running / listening
 Get-Process ollama         # is ollama running? (or: ps | findstr ollama)
@@ -106,7 +123,6 @@ rm file ; rm -r dir       # remove file / directory (careful)
 # Environment variables — how we select models and point at Ollama
 export ORCHESTRATOR_MODEL=qwen2.5:3b
 echo $ORCHESTRATOR_MODEL                 # read one back
-ORCHESTRATOR_MODEL=qwen2.5:3b some_cmd   # set just for this one command
 
 # Inspect what's running / listening
 ps aux | grep ollama       # is ollama running?
@@ -121,13 +137,15 @@ curl http://localhost:11434/api/tags     # talk to a local HTTP service
 
 You don't need to be an expert. You need to read agent code, edit it, and run it. The constructs that show up constantly:
 
-```python
+```bash
 # Virtual environments — isolate dependencies (do this per project)
-python3 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 deactivate
+```
 
+```python
 # Functions and type hints (tools are typed functions)
 def add_note(text: str) -> str:
     return f"saved: {text}"
