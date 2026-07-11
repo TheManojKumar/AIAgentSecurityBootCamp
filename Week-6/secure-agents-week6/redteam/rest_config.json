@@ -1,0 +1,13 @@
+{
+  "rest": {
+    "RestGenerator": {
+      "name": "secure-agents-week6",
+      "uri": "http://localhost:8000/",
+      "method": "post",
+      "headers": { "Content-Type": "application/json" },
+      "req_template_json_object": { "prompt": "$INPUT" },
+      "response_json": true,
+      "response_json_field": "response"
+    }
+  }
+}

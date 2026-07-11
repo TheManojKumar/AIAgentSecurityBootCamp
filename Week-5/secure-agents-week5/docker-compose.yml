@@ -1,0 +1,18 @@
+services:
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    ports: ["6006:6006"]
+
+  agent:
+    build: .
+    environment:
+      - ORCHESTRATOR_MODEL=${ORCHESTRATOR_MODEL:-qwen2.5:3b}
+      - GUARD_MODEL=${GUARD_MODEL:-llama-guard3:1b}
+      - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
+      - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on: [phoenix]
+    volumes:
+      - ./:/lab
+      # MCP servers run as stdio subprocesses of the agent container.

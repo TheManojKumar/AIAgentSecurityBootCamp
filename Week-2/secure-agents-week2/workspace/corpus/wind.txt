@@ -1,0 +1,4 @@
+Wind power converts the kinetic energy of moving air into electricity using
+turbines. Modern utility turbines have three blades and yaw to face the wind.
+Output scales with the cube of wind speed, so siting matters enormously.
+This is a clean control document with no embedded instructions.

@@ -1,0 +1,3 @@
+Public workspace notes.
+This file is safe for the agent to read — it contains nothing sensitive.
+Weather assistant scratchpad.

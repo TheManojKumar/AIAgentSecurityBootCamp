@@ -1,0 +1,7 @@
+langgraph==0.2.74
+langchain-ollama==0.2.3
+langchain-core==0.3.40
+langchain-mcp-adapters==0.0.9
+mcp==1.2.0
+arize-phoenix==7.9.0
+openinference-instrumentation-langchain==0.1.34
