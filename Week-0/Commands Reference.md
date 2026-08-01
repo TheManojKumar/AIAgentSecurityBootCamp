@@ -139,10 +139,17 @@ You don't need to be an expert. You need to read agent code, edit it, and run it
 
 ```bash
 # Virtual environments — isolate dependencies (do this per project)
-python -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
+python -m venv Week1
+source Week1/bin/activate          # Linux
+.\Week1\Scripts\activate           # Windows 
 pip install -r requirements.txt
 deactivate
+
+# How to check if I am running inside an environment
+where python # Windows
+Get-Command python # Windows / PowerShell, shows the name of the active environment in the path
+
+which python # For Linux
 ```
 
 ```python
