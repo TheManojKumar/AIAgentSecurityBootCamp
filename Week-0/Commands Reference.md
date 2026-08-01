@@ -192,16 +192,20 @@ Containers are how the labs are distributed so everyone runs an identical enviro
 
 ```bash
 # Images vs containers: an image is the blueprint, a container is a running instance
-docker pull ghcr.io/<yourorg>/secure-agents-week1:latest   # download an image
+docker pull dyego/snake-game
+docker pull docker/doodle
+docker pull dyego/snake-game:latest   # download an image
 docker images                          # list local images
 docker ps                              # running containers
 docker ps -a                           # all containers, including stopped
 
 # Run things
 docker run --rm hello-world            # run, then auto-remove
-docker run --rm -it python:3.12-slim bash   # interactive shell in a container
+docker run -it docker/doodle           # interactive shell in the containers
+docker run -ti dyego/snake-game
 
 # Compose — bring up a multi-container lab (agent + Phoenix) from one file
+# Will cover in future sessions
 docker compose up                      # start everything in docker-compose.yml
 docker compose run --rm agent python check_env.py   # run one command in the 'agent' service
 docker compose down                    # stop and clean up
@@ -210,11 +214,12 @@ docker compose down                    # stop and clean up
 #   Mac/Windows: use host.docker.internal
 #   Linux: our compose adds  extra_hosts: ["host.docker.internal:host-gateway"]
 #          or run with --network=host and use localhost
+# We will dig more into it in future
 docker run --rm --network=host my-image   # container shares host network (Linux)
 ```
 
 **Minimal compose mental model** — you'll see files like this and should be able to read them:
-
+# Let's revisit them in future, not really required to be productive
 ```yaml
 services:
   phoenix:                              # tracing UI, no account needed
