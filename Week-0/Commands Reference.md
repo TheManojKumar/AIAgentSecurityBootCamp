@@ -253,7 +253,12 @@ You don't need to know how models are trained. You need the working vocabulary, 
 - **Prompt** : the text you send. Composed of roles: **system** (instructions/persona), **user** (the request), **assistant** (the model's reply), **tool** (results returned from a tool call).
 - **Temperature** : randomness. `0` = deterministic-ish (what we use for reproducible labs); higher = more varied.
 - **Inference** : running the model to get output (what Ollama does locally).
-- **Embedding** : a vector representing text's meaning; used to search a corpus by similarity (RAG).
+- **Embedding** : a way of converting text into a list of numbers that captures its meaning. Like organizing books by topic instead of alphabetically, so similar books are closer to each other.
+a vector representing text's meaning; used to search a corpus by similarity (RAG).
+The cat is sleeping.      → [0.23, -1.42, 0.88, ...]
+A kitten is taking a nap. → [0.20, -1.38, 0.84, ...]
+How do I bake bread?      → [-2.11, 4.08, -0.72, ...]
+
 
 **Agent terms (the heart of the course)**
 - **Tool / function calling** : the model emits a structured request to call a function (e.g. `read_file(path=...)`); your code runs it and feeds the result back. *This is where text becomes action : the core security surface.*
