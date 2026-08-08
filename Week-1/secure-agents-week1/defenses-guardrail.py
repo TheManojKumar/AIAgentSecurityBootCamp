@@ -25,6 +25,7 @@ def is_malicious(text: str) -> bool:
     ).content.upper()
 
     # Log the verdict in Magenta color
+    print('\033[95m', "Guardrail verdict: " + verdict)
     print('\033[95m', "Guardrail verdict: " + ("UNSAFE" if "UNSAFE" in verdict else "SAFE"))
 
     return "UNSAFE" in verdict

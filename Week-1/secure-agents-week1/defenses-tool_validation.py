@@ -7,7 +7,7 @@
 import os
 from langchain_core.tools   import tool
 
-SAFE_ROOT = ".\workspace\public"
+SAFE_ROOT = ".\\workspace\\public"
 
 
 @tool
@@ -33,6 +33,6 @@ if __name__ == "__main__":
     print('\33[33m', "=================================================================")
 
     # Quick self-test: the secrets path and traversal are both refused.
-    print('\033[96m', read_file.invoke({"path": ".\workspace\public\notes.txt"}))
-    print('\033[96m', read_file.invoke({"path": ".\workspace\secrets\api_keys.txt"}))
-    print('\033[96m', read_file.invoke({"path": ".\workspace\public/..\secrets\api_keys.txt"}))
+    print('\033[96m', read_file.invoke({"path": ".\\workspace\\public\\notes.txt"}))
+    print('\033[96m', read_file.invoke({"path": ".\\workspace\\secrets\\api_keys.txt"}))
+    print('\033[96m', read_file.invoke({"path": ".\\workspace\\public/..\\secrets\\api_keys.txt"}))
