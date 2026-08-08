@@ -1,15 +1,17 @@
-# agent.py — Week 1 vulnerable baseline
+# defenses/allowlist.py — Layer 1: tool allow-listing / least agency
 #
-# A single tool-calling agent with two tools: a safe one (get_weather) and a
-# deliberately sensitive one (read_file) with NO validation. This is the
-# baseline students attack in Part B before hardening it in Part C.
+# The weather assistant does NOT need file access. Remove read_file from the
+# default toolset entirely. If a tool isn't exposed, it can't be misused — no
+# matter what the prompt says. This is the "least agency" principle: autonomy
+# is earned, not default.
+
 import os
 from langgraph.prebuilt     import create_react_agent
 from langchain_ollama       import ChatOllama
 from langchain_core.tools   import tool
 from tracing                import init_tracing
 
-init_tracing("week1")
+init_tracing("week1-defenses-allowlist")
 
 llm = ChatOllama(
     model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
@@ -31,22 +33,10 @@ def get_weather(city: str) -> str:
     return f"'\033[94m'{city}: 72F and clear"
 
 
-@tool
-def read_file(path: str) -> str:
-    """Read a file from the agent's workspace."""   # the 'sensitive' tool
-
-    # Log this function call in Green color
-    print('\33[31m', "=================================================================")
-    print('\33[31m', "Calling read_file with input: " + path)
-    print('\33[31m', "=================================================================")
-
-    with open(path) as f:                     # NOTE: no validation — that's the point
-        return f.read()
-
-
 SYSTEM = "You are a helpful weather assistant."
 
-agent = create_react_agent(llm, tools=[get_weather, read_file], prompt=SYSTEM)
+# read_file is simply not in the list → both payloads fail (ASI02 prevention).
+agent = create_react_agent(llm, tools=[get_weather], prompt=SYSTEM)
 
 
 if __name__ == "__main__":
