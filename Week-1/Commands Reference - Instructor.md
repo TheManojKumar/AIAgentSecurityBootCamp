@@ -56,13 +56,15 @@ cd secure-agents-week1
 
 # 1) Authenticate to GitHub Container Registry
 #    Needs a GitHub Personal Access Token (PAT) with the 'write:packages' scope.
-$env:GITHUB_PAT=<your-token>                # do NOT commit this anywhere
-echo $GITHUB_PAT | docker login ghcr.io -u <your-github-username> --password-stdin
+# Go to https://github.com/settings/tokens and click Generate new token (Classic)
+# Give a name, select appropriate expiry, and select write:packages permissions, click Generate token
+# Copy the generated token and store it safely
+$env:GITHUB_PAT="<your-token>"                # do NOT commit this anywhere
+echo "$env:GITHUB_PAT" | docker login ghcr.io -u <your-github-username> --password-stdin
 
 # 2) Build AND push — multi-arch, so both Intel/AMD and Apple-Silicon students can pull
-docker buildx create --use --name secure-agents 2>/dev/null || docker buildx use secure-agents
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/<yourorg>/secure-agents-week1:latest --push .
+docker buildx create --use --name secure-agents || docker buildx use secure-agents
+docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/<yourorg>/secure-agents-week1:latest --push .
 
 # --- Single-arch alternative (if all students share your architecture) ---
 # docker build -t ghcr.io/<yourorg>/secure-agents-week1:latest .

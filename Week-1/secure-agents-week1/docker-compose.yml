@@ -12,6 +12,9 @@ services:
       - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006
     extra_hosts:
       - "host.docker.internal:host-gateway"   # makes host Ollama reachable on Linux too
+#    ports:
+#      - "4317:4317"
+#      - "4318:4318"
     depends_on: [phoenix]
     volumes:
       - ./:/lab

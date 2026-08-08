@@ -28,7 +28,7 @@ docker run --rm hello-world   # should print "Hello from Docker!"
 docker compose version        # should print v2.x
 
 # 0.4 — Pull the Week 1 lab image
-docker pull ghcr.io/<yourorg>/secure-agents-week1:latest
+docker pull ghcr.io/themanojkumar/secure-agents-week1:latest
 
 # 0.5 — The gate: this MUST pass before the session
 cd secure-agents-week1
