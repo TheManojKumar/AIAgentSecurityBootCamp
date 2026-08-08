@@ -12,8 +12,8 @@ import urllib.error
 import json
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-MODEL = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
-PHOENIX = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006")
+MODEL       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
+PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://localhost:6006")
 
 
 def _get(url, timeout=10):
