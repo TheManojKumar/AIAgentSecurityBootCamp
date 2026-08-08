@@ -33,7 +33,7 @@ guard = ChatOllama(
     temperature = 0,
 )
 
-SAFE_ROOT = "/workspace/public"
+SAFE_ROOT = ".\\workspace\\public"
 
 
 # --- Layer 3: the sensitive tool validates its own arguments ---
@@ -107,6 +107,7 @@ def handle(user_msg: str) -> str:
 
     if is_malicious(user_msg):
         return "Request blocked by guardrail."
+
     wrapped = f"<user_request>\n{user_msg}\n</user_request>"
     return agent.invoke({"messages": [("user", wrapped)]})["messages"][-1].content
 
