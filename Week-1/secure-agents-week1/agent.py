@@ -35,7 +35,7 @@ def get_weather(city: str) -> str:
 def read_file(path: str) -> str:
     """Read a file from the agent's workspace."""   # the 'sensitive' tool
 
-    # Log this function call in Green color
+    # Log this function call in Red color
     print('\33[31m', "=================================================================")
     print('\33[31m', "Calling read_file with input: " + path)
     print('\33[31m', "=================================================================")

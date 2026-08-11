@@ -27,11 +27,11 @@ ollama pull llama-guard3:1b   # guardrail / judge (used in DEFEND, Layer 4)
 docker run --rm hello-world   # should print "Hello from Docker!"
 docker compose version        # should print v2.x
 
-# 0.4 — Pull the Week 1 lab image
-docker pull ghcr.io/themanojkumar/secure-agents-week1:latest
+# 0.4 — Build the Week 1 lab image locally (compose builds it from the Dockerfile)
+cd secure-agents-week1
+docker compose build --no-cache
 
 # 0.5 — The gate: this MUST pass before the session
-cd secure-agents-week1
 $env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
 docker compose run --rm agent python check_env.py
 ```

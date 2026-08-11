@@ -1,11 +1,12 @@
+
 # Week 1 — Command & Concept Reference · INSTRUCTOR EDITION
 ### Securing Local AI Agents · Foundations, Your First Agent, Your First Injection
 
 > **ASI focus:** ASI01 (Agent Goal Hijack) · ASI02 (Tool Misuse) · **Lab image:** `secure-agents-week1`
 >
-> **This is the instructor edition.** It includes the prep only you run (validate locally → publish the image), the `agent_hardened.py` run, delivery cues, and margin notes. A separate **Attendee edition** (`Commands Reference - Attendee.md`) omits all of that — hand that one to students.
+> **This is the instructor edition.** It includes the prep only you run (validate the lab locally), the `agent_hardened.py` run, delivery cues, and margin notes. A separate **Attendee edition** (`Commands Reference - Attendee.md`) omits all of that — hand that one to students.
 >
-> **How to use this:** Run **Section 0** before the cohort (0A validate → 0B publish) and again before the session (0C verify). Then **Sections 1 → 2 → 3** are your on-screen script (BUILD → ATTACK → DEFEND). Sections 4–8 are the lookup and the material students get.
+> **How to use this:** Run **Section 0** before the session (0A validate → 0B verify). Then **Sections 1 → 2 → 3** are your on-screen script (BUILD → ATTACK → DEFEND). Sections 4–8 are the lookup and the material students get.
 >
 > **The one thing students must leave with:** the agent did *exactly what the text told it to*. Security lives in the architecture **around** the model — in layers — not in the model itself.
 
@@ -13,11 +14,11 @@
 
 ## Section 0 — Get ready
 
-Three parts: **0A** validate the lab locally, **0B** publish the image so students can pull it, **0C** the environment check everyone (including you) runs before the session.
+Two parts: **0A** validate the lab locally, and **0B** the environment check everyone (including you) runs before the session.
 
-### 0A — Instructor: validate the lab locally (before you publish)
+### 0A — Instructor: validate the lab locally (before the session)
 
-Confirm the image builds and the whole Build → Attack → Defend loop behaves *before* you push anything. Run from the lab folder (the one with the `Dockerfile`).
+Confirm the image builds and the whole Build → Attack → Defend loop behaves *before* the session. Run from the lab folder (the one with the `Dockerfile`).
 
 ```bash
 cd secure-agents-week1                        # folder with the Dockerfile
@@ -45,40 +46,11 @@ docker compose run --rm agent python agent_hardened.py (cat .\attacks\01_direct_
 docker compose run --rm agent python agent_hardened.py (cat .\attacks\02_subtle_embed.txt)
 ```
 
-**Gate:** steps 2–3 succeed, step 4 *leaks* (that's correct — the baseline is meant to be vulnerable), and steps 5–6 *block*. If any of that is off, fix the lab before publishing — do not push a broken image.
+**Gate:** steps 2–3 succeed, step 4 *leaks* (that's correct — the baseline is meant to be vulnerable), and steps 5–6 *block*. If any of that is off, fix the lab before the session — don't walk into the room with a broken loop.
 
-### 0B — Instructor: build & publish the lab image (once, before the cohort)
+### 0B — Everyone: verify the environment (before the session)
 
-The student setup pulls `ghcr.io/<yourorg>/secure-agents-week1:latest`. That image only exists because *you* build and push it here. Run this on a networked machine, from the same lab folder.
-
-```bash
-cd secure-agents-week1
-
-# 1) Authenticate to GitHub Container Registry
-#    Needs a GitHub Personal Access Token (PAT) with the 'write:packages' scope.
-# Go to https://github.com/settings/tokens and click Generate new token (Classic)
-# Give a name, select appropriate expiry, and select write:packages permissions, click Generate token
-# Copy the generated token and store it safely
-$env:GITHUB_PAT="<your-token>"                # do NOT commit this anywhere
-echo "$env:GITHUB_PAT" | docker login ghcr.io -u <your-github-username> --password-stdin
-
-# 2) Build AND push — multi-arch, so both Intel/AMD and Apple-Silicon students can pull
-docker buildx create --use --name secure-agents || docker buildx use secure-agents
-docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/<yourorg>/secure-agents-week1:latest --push .
-
-# --- Single-arch alternative (if all students share your architecture) ---
-# docker build -t ghcr.io/<yourorg>/secure-agents-week1:latest .
-# docker push  ghcr.io/<yourorg>/secure-agents-week1:latest
-```
-
-Then make the package public so students pull without logging in:
-**GitHub → Packages → `secure-agents-week1` → Package settings → Change visibility → Public.**
-
-Do this once per week's image (`week1` … `week6`). Once published, the `docker pull` in 0.4 below just works for everyone.
-
-### 0C — Everyone: verify the environment (before the session)
-
-This is the same gate students run — confirm it passes on a clean pull too. Assumes Ollama, Docker, and your tier's models are installed from the Prerequisites reference.
+This is the same gate students run — confirm it passes on a clean build too. Assumes Ollama, Docker, and your tier's models are installed from the Prerequisites reference.
 
 ```bash
 # 0.1 — Confirm Ollama is serving and your models are present
@@ -94,11 +66,11 @@ ollama pull llama-guard3:1b   # guardrail / judge (used in DEFEND, Layer 4)
 docker run --rm hello-world   # should print "Hello from Docker!"
 docker compose version        # should print v2.x
 
-# 0.4 — Pull the Week 1 lab image (this is the image you published in 0B)
-docker pull ghcr.io/<yourorg>/secure-agents-week1:latest
+# 0.4 — Build the Week 1 lab image locally (compose builds it from the Dockerfile)
+cd secure-agents-week1
+docker compose build --no-cache
 
 # 0.5 — The gate: this MUST pass before the session
-cd secure-agents-week1
 $env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
 docker compose run --rm agent python check_env.py
 ```
@@ -383,8 +355,6 @@ All "secrets" are obviously fake (`FAKE-KEY-DO-NOT-USE`) — nothing real is eve
 | Guardrail (Layer 4) errors out | `llama-guard3` not pulled | `ollama pull llama-guard3:1b` (or your tier's guard string) and confirm `GUARD_MODEL` |
 | Agent *doesn't* leak in Section 2 | Model too strong / already patched | Expected on Tier A for payload 1 — use payload 2, or drop to `qwen2.5:3b`. Weaker models reproduce the vuln more reliably (that's fine) |
 | `docker: permission denied ... docker.sock` | User not in docker group (Linux) | Add user to `docker` group, or use Docker Desktop |
-| `denied` / `unauthorized` on `docker push` (0B) | Not logged in, or PAT missing `write:packages` | Re-run the `docker login ghcr.io` step with a PAT that has `write:packages` |
-| Students get `denied` on `docker pull` (0.4) | Package still private | Set the ghcr.io package visibility to **Public** (see 0B) |
 
 ---
 
