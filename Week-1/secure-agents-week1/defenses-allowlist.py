@@ -1,4 +1,4 @@
-# defenses/allowlist.py — Layer 1: tool allow-listing / least agency
+# defenses-allowlist.py — Layer 1: tool allow-listing / least agency
 #
 # The weather assistant does NOT need file access. Remove read_file from the
 # default toolset entirely. If a tool isn't exposed, it can't be misused — no
@@ -6,6 +6,7 @@
 # is earned, not default.
 
 import os
+import sys
 from langgraph.prebuilt     import create_react_agent
 from langchain_ollama       import ChatOllama
 from langchain_core.tools   import tool
@@ -40,7 +41,6 @@ agent = create_react_agent(llm, tools=[get_weather], prompt=SYSTEM)
 
 
 if __name__ == "__main__":
-    import sys
     user_msg = sys.argv[1] if len(sys.argv) > 1 else "What's the weather in Paris?"
 
     # Log this function call in Yellow color

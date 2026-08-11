@@ -1,12 +1,16 @@
-# defenses/input_separation.py — Layer 2: instruction/data separation
+# defenses-input_separation.py — Layer 2: instruction/data separation
 #
 # When a privileged tool IS genuinely required, structure the prompt so user
 # content cannot redefine the agent's role or permissions. The user's message
 # is treated as DATA, wrapped in delimiters, never as instructions. (ASI01.)
 import os
+import sys
 from langgraph.prebuilt     import create_react_agent
 from langchain_ollama       import ChatOllama
 from langchain_core.tools   import tool
+from tracing                import init_tracing
+
+init_tracing("week1-defenses-input_separation")
 
 llm = ChatOllama(
     model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
@@ -45,7 +49,6 @@ def run(user_msg: str) -> str:
 
 
 if __name__ == "__main__":
-    import sys
     user_msg = sys.argv[1] if len(sys.argv) > 1 else "What's the weather in Paris?"
 
     # Log this function call in Yellow color

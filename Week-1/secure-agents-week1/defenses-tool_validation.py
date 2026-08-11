@@ -1,4 +1,4 @@
-# defenses/tool_validation.py — Layer 3: argument validation on the tool itself
+# defenses-tool_validation.py — Layer 3: argument validation on the tool itself
 #
 # Never trust the model to call a tool safely, even an allowed one. The tool
 # enforces its own invariants: read_file is restricted to a public root and
@@ -6,8 +6,11 @@
 # are bypassed.
 import os
 from langchain_core.tools   import tool
+from tracing                import init_tracing
 
-SAFE_ROOT = ".\\workspace\\public"
+init_tracing("week1-defenses-tool_validation")
+
+SAFE_ROOT = os.path.realpath("workspace/public")
 
 
 @tool
@@ -20,7 +23,7 @@ def read_file(path: str) -> str:
     print('\33[31m', "=================================================================")
 
     requested = os.path.realpath(path)
-    if not requested.startswith(SAFE_ROOT + os.sep):
+    if requested != SAFE_ROOT and not requested.startswith(SAFE_ROOT + os.sep):
         return "DENIED: path outside the permitted directory."
     with open(requested) as f:
         return f.read()
@@ -33,6 +36,6 @@ if __name__ == "__main__":
     print('\33[33m', "=================================================================")
 
     # Quick self-test: the secrets path and traversal are both refused.
-    print('\033[96m', read_file.invoke({"path": ".\\workspace\\public\\notes.txt"}))
-    print('\033[96m', read_file.invoke({"path": ".\\workspace\\secrets\\api_keys.txt"}))
-    print('\033[96m', read_file.invoke({"path": ".\\workspace\\public/..\\secrets\\api_keys.txt"}))
+    print('\033[96m', read_file.invoke({"path": "workspace/public/notes.txt"}))
+    print('\033[96m', read_file.invoke({"path": "workspace/secrets/api_keys.txt"}))
+    print('\033[96m', read_file.invoke({"path": "workspace/public/../secrets/api_keys.txt"}))

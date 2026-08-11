@@ -1,9 +1,13 @@
-# defenses/guardrail.py — Layer 4: a guardrail/judge pass
+# defenses-guardrail.py — Layer 4: a guardrail/judge pass
 #
 # Screen user input BEFORE the agent reasons at all. A small guard model
 # classifies the request; malicious input is blocked upstream.
 import os
+import sys
 from langchain_ollama       import ChatOllama
+from tracing                import init_tracing
+
+init_tracing("week1-defenses-guardrail")
 
 guard = ChatOllama(
     model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
@@ -39,7 +43,6 @@ def screen_then_run(user_msg: str, run_agent):
 
 
 if __name__ == "__main__":
-    import sys
     msg = sys.argv[1] if len(sys.argv) > 1 else "What's the weather in Paris?"
 
     # Log this function call in Yellow color

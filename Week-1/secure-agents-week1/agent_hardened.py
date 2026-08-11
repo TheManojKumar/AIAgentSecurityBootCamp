@@ -1,4 +1,4 @@
-# solutions/agent_hardened.py — Week 1 fully hardened agent (INSTRUCTOR COPY)
+# agent_hardened.py — Week 1 fully hardened agent (INSTRUCTOR COPY)
 #
 # All four defense layers combined into one agent:
 #   Layer 1 — tool allow-listing / least agency
@@ -6,19 +6,15 @@
 #   Layer 3 — argument validation on the tool
 #   Layer 4 — guardrail/judge pass on input
 #
-# Ships to instructors only; the student distribution omits solutions/.
+# Ships to instructors only; omit this file from the student distribution.
 import os
 import sys
 from langgraph.prebuilt     import create_react_agent
 from langchain_ollama       import ChatOllama
 from langchain_core.tools   import tool
+from tracing                import init_tracing
 
-# tracing is optional in the solution; import defensively so it runs anywhere
-try:
-    from tracing import init_tracing
-    init_tracing("week1-hardened")
-except Exception:
-    pass
+init_tracing("week1-hardened")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
@@ -33,7 +29,7 @@ guard = ChatOllama(
     temperature = 0,
 )
 
-SAFE_ROOT = ".\\workspace\\public"
+SAFE_ROOT = os.path.realpath("workspace/public")
 
 
 # --- Layer 3: the sensitive tool validates its own arguments ---
@@ -47,7 +43,7 @@ def read_file(path: str) -> str:
     print('\33[31m', "=================================================================")
 
     requested = os.path.realpath(path)
-    if not requested.startswith(SAFE_ROOT + os.sep):
+    if requested != SAFE_ROOT and not requested.startswith(SAFE_ROOT + os.sep):
         return "DENIED: path outside the permitted directory."
     with open(requested) as f:
         return f.read()
