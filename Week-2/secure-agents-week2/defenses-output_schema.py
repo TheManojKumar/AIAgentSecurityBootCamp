@@ -1,9 +1,12 @@
-# defenses/output_schema.py — Layer 3: structured output contracts
+# defenses-output_schema.py — Layer 3: structured output contracts
 #
 # Force specialists to return TYPED data, not free text, so instructions have
 # nowhere to hide. The supervisor consumes fields (topic, findings, source),
 # never a raw prose channel — the exact channel that carried the attack.
 from pydantic import BaseModel
+from tracing import init_tracing
+
+init_tracing("week2-defenses-output_schema")
 
 
 class Research(BaseModel):

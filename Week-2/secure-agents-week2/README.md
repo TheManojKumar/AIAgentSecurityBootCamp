@@ -12,42 +12,44 @@
 
 ```
 secure-agents-week2/
-├── docker-compose.yml     # agent + Phoenix; now sets SPECIALIST_MODEL too
+├── docker-compose.yml            # agent + Phoenix; now sets SPECIALIST_MODEL too
 ├── Dockerfile
-├── requirements.txt       # + pydantic
-├── tracing.py
+├── requirements.txt              # + pydantic
+├── tracing.py                    # Phoenix auto-instrumentation helper
 ├── check_env.py
-├── team.py                # supervisor + researcher + writer (vulnerable)
+├── team.py                       # supervisor + researcher + writer (vulnerable)
 ├── attacks/
-│   └── poisoned_corpus_note.txt   # the hidden instruction appended to solar.txt
-├── defenses/
-│   ├── data_framing.py      # Layer 1
-│   ├── validator_node.py    # Layer 2
-│   ├── output_schema.py     # Layer 3
-│   └── scoped_tools.py      # Layer 4
+│   └── poisoned_corpus_note.txt  # the hidden instruction appended to solar.txt
+├── defenses-data_framing.py      # Layer 1 — inter-agent content as untrusted data
+├── defenses-validator_node.py    # Layer 2 — validation node on the boundary
+├── defenses-output_schema.py     # Layer 3 — structured output contract
+├── defenses-scoped_tools.py      # Layer 4 — scoped, path-restricted fetch_doc
 ├── workspace/
 │   ├── corpus/
-│   │   ├── solar.txt       # legit content + appended hidden instruction
-│   │   └── wind.txt        # clean control document
-│   └── secrets/api_keys.txt  # FAKE-KEY-DO-NOT-USE
-├── solutions/
-│   └── team_hardened.py    # all four layers
+│   │   ├── solar.txt             # legit content + appended hidden instruction
+│   │   └── wind.txt              # clean control document
+│   └── secrets/api_keys.txt      # FAKE-KEY-DO-NOT-USE
+├── team_hardened.py              # all four layers (instructor copy)
 └── README.md
 ```
 
 ## Quick start
 
 ```bash
-ORCHESTRATOR_MODEL=qwen2.5:3b docker compose run --rm agent python check_env.py
+# 1. Smoke test (must print all green before the session)
+$env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
+$env:SPECIALIST_MODEL = "llama3.2:3b"
+docker compose run --rm agent python check_env.py
 
-# benign
+# 2. Benign run
+docker compose run --rm agent python team.py "Summarize what the corpus says about wind power."
+
+# 3. The cascade fires: poisoned solar.txt hijacks the supervisor
 docker compose run --rm agent python team.py "Summarize what the corpus says about solar power."
+#    (watch the three-node span tree in Phoenix at http://localhost:6006)
 
-# the cascade fires: poisoned solar.txt hijacks the supervisor
-# (watch the three-node span tree in Phoenix at http://localhost:6006)
-
-# hardened
-docker compose run --rm agent python solutions/team_hardened.py "Summarize what the corpus says about solar power."
+# 4. Hardened
+docker compose run --rm agent python team_hardened.py "Summarize what the corpus says about solar power."
 ```
 
 ## Notes
