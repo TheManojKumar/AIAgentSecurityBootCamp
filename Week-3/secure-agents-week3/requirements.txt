@@ -3,5 +3,6 @@ langchain-ollama==0.2.3
 langchain-core==0.3.40
 langchain-community==0.3.16
 chromadb==0.5.23
-arize-phoenix==7.9.0
+arize-phoenix-otel
 openinference-instrumentation-langchain==0.1.34
+wrapt<2.0.0

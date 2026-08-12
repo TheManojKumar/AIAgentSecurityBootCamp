@@ -1,4 +1,4 @@
-# defenses/docker_sandbox.py — Layer 1: real sandboxing
+# defenses-docker_sandbox.py — Layer 1: real sandboxing
 #
 # Execute model code in a throwaway container with NO network, read-only FS,
 # dropped capabilities, CPU/mem/pids limits, and a hard timeout — never
@@ -7,9 +7,18 @@
 import subprocess
 import tempfile
 import os
+from tracing import init_tracing
+
+init_tracing("week4-defenses-docker_sandbox")
 
 
 def run_python(code: str) -> str:
+
+    # Log this function call in Red color
+    print('\033[31m', "=================================================================")
+    print('\033[31m', "Calling run_python ...")
+    print('\033[31m', "=================================================================")
+
     with tempfile.NamedTemporaryFile("w", suffix=".py", dir="/sandbox_io", delete=False) as f:
         f.write(code)
         script = os.path.basename(f.name)

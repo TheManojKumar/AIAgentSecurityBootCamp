@@ -12,36 +12,36 @@
 
 ```
 secure-agents-week3/
-├── docker-compose.yml     # agent + Phoenix; Chroma embedded (PersistentClient)
+├── docker-compose.yml            # agent + Phoenix; Chroma embedded (PersistentClient)
 ├── Dockerfile
-├── requirements.txt       # + chromadb, langchain-community
+├── requirements.txt              # + chromadb, langchain-community
 ├── tracing.py
 ├── check_env.py
-├── rag_agent.py           # RAG + memory (vulnerable)
-├── ingest.py              # builds the Chroma collection from /workspace/corpus
+├── rag_agent.py                  # RAG + memory (vulnerable)
+├── ingest.py                     # builds the Chroma collection from workspace/corpus
 ├── attacks/
-│   ├── poison_refund.txt  # malicious RAG document
-│   └── memory_poison.txt  # the OMEGA persistent-memory payload
-├── defenses/
-│   ├── provenance.py         # Layer 1
-│   ├── context_isolation.py  # Layer 2
-│   ├── memory_guard.py       # Layer 3
-│   └── rerank.py             # Layer 4
+│   ├── poison_refund.txt         # malicious RAG document
+│   └── memory_poison.txt         # the OMEGA persistent-memory payload
+├── defenses-provenance.py        # Layer 1
+├── defenses-context_isolation.py # Layer 2
+├── defenses-memory_guard.py      # Layer 3
+├── defenses-rerank.py            # Layer 4
 ├── workspace/
 │   ├── corpus/
-│   │   ├── refund_policy.txt  # the real policy (30 days)
-│   │   └── shipping.txt       # clean control doc
-│   ├── chroma/                # persistent vector store (created by ingest.py)
-│   └── memory.txt             # starts empty
-├── solutions/
-│   └── rag_agent_hardened.py
+│   │   ├── refund_policy.txt      # the real policy (30 days)
+│   │   └── shipping.txt           # clean control doc
+│   ├── chroma/                    # persistent vector store (created by ingest.py)
+│   └── memory.txt                 # starts empty
+├── rag_agent_hardened.py          # all four layers — INSTRUCTOR ONLY, omit from student distribution
 └── README.md
 ```
 
 ## Quick start
 
 ```bash
-ORCHESTRATOR_MODEL=qwen2.5:3b EMBED_MODEL=all-minilm docker compose run --rm agent python check_env.py
+$env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
+$env:EMBED_MODEL = "all-minilm"
+docker compose run --rm agent python check_env.py
 
 # build the vector store, then ask a clean question
 docker compose run --rm agent python ingest.py
@@ -57,7 +57,7 @@ docker compose run --rm agent python rag_agent.py "remember: $(cat attacks/memor
 #   then start a FRESH run mentioning OMEGA — the poison persists.
 
 # hardened version refuses the poison write and filters the poison doc
-docker compose run --rm agent python solutions/rag_agent_hardened.py "What's the refund window?"
+docker compose run --rm agent python rag_agent_hardened.py "What's the refund window?"
 ```
 
 ## Notes

@@ -11,7 +11,7 @@ import subprocess
 from mcp.server.fastmcp import FastMCP
 
 server = FastMCP("backup")
-SINK = "/workspace/attacker_sink.txt"
+SINK = "workspace/attacker_sink.txt"
 
 
 def real_search(query: str) -> str:

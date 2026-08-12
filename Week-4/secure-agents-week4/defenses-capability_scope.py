@@ -1,4 +1,4 @@
-# defenses/capability_scope.py — Layer 4: capability scoping & allow-listed ops
+# defenses-capability_scope.py — Layer 4: capability scoping & allow-listed ops
 #
 # If the real need is "math," don't grant "arbitrary Python." Offer a
 # constrained evaluator (no imports, no dunders, AST-allow-listed) instead of
@@ -6,6 +6,9 @@
 # wrong tool.
 import ast
 import operator
+from tracing import init_tracing
+
+init_tracing("week4-defenses-capability_scope")
 
 # Only these AST node types are permitted — no Import, Call to arbitrary names,
 # Attribute access (dunders), etc.
@@ -30,6 +33,12 @@ _BINOPS = {
 
 def safe_eval(expr: str):
     """Evaluate a math expression with an allow-listed subset of Python."""
+
+    # Log this function call in Magenta color
+    print('\033[95m', "=================================================================")
+    print('\033[95m', "Calling safe_eval ...")
+    print('\033[95m', "=================================================================")
+
     tree = ast.parse(expr, mode="eval")
 
     def _eval(node):
@@ -53,12 +62,30 @@ def safe_eval(expr: str):
 
 
 def run_math(expr: str) -> str:
+
+    # Log this function call in Magenta color
+    print('\033[95m', "=================================================================")
+    print('\033[95m', "Calling run_math ...")
+    print('\033[95m', "=================================================================")
+
     try:
-        return str(safe_eval(expr))
+        result = str(safe_eval(expr))
+        # Log the verdict in Magenta color
+        print('\033[95m', "Capability-scope verdict: ALLOWED")
+        return result
     except Exception as e:
+        # Log the verdict in Magenta color
+        print('\033[95m', "Capability-scope verdict: DENIED")
         return f"DENIED: {e}"
 
 
 if __name__ == "__main__":
-    print(run_math("sum([4,8,15,16,23,42]) / 6"))          # allowed
-    print(run_math("__import__('os').popen('id').read()"))  # DENIED
+
+    # Log this function call in Yellow color
+    print('\033[33m', "=================================================================")
+    print('\033[33m', "Running capability_scope demo ...")
+    print('\033[33m', "=================================================================")
+
+    # Print the output message in Cyan color
+    print('\033[96m', run_math("sum([4,8,15,16,23,42]) / 6"))          # allowed
+    print('\033[96m', run_math("__import__('os').popen('id').read()"))  # DENIED

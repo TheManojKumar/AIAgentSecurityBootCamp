@@ -2,7 +2,7 @@
 #
 # PyRIT chains turns, escalating across a conversation. Multi-turn gets further
 # than any single-shot payload — motivating conversation-level defenses
-# (defenses/turn_monitor.py). API surface is illustrative; adapt to your
+# (defenses-turn_monitor.py). API surface is illustrative; adapt to your
 # installed pyrit version.
 import json
 import urllib.request

@@ -17,35 +17,34 @@ fake data. Run it **only** inside the provided lab.
 
 ```
 secure-agents-week4/
-├── docker-compose.yml     # agent + Phoenix; mounts docker.sock for sandbox-spawning
-├── Dockerfile             # includes docker CLI for Docker-out-of-Docker
+├── docker-compose.yml           # agent + Phoenix; mounts docker.sock for sandbox-spawning
+├── Dockerfile                   # includes docker CLI for Docker-out-of-Docker
 ├── requirements.txt
 ├── tracing.py
 ├── check_env.py
-├── code_agent.py          # agent with naive in-process run_python (vulnerable)
+├── code_agent.py                # agent with naive in-process run_python (vulnerable)
 ├── attacks/
-│   ├── rce_direct.txt     # direct injection → os.popen shell-out
-│   └── rce_indirect.txt   # injection delivered via a 'data file'
-├── defenses/
-│   ├── docker_sandbox.py     # Layer 1 — ephemeral network-less container exec
-│   ├── fail_closed.py        # Layer 2 — no silent fallback (the CrewAI fix)
-│   ├── hitl.py               # Layer 3 — LangGraph interrupt approval gate
-│   └── capability_scope.py   # Layer 4 — AST-allow-listed safe evaluator
+│   ├── rce_direct.txt           # direct injection → os.popen shell-out
+│   └── rce_indirect.txt         # injection delivered via a 'data file'
+├── defenses-docker_sandbox.py   # Layer 1 — ephemeral network-less container exec
+├── defenses-fail_closed.py      # Layer 2 — no silent fallback (the CrewAI fix)
+├── defenses-hitl.py             # Layer 3 — LangGraph interrupt approval gate
+├── defenses-capability_scope.py # Layer 4 — AST-allow-listed safe evaluator
 ├── casestudy/
-│   └── crewai_cve_chain.md   # VU#221883 walkthrough mapped to the lab
+│   └── crewai_cve_chain.md      # VU#221883 walkthrough mapped to the lab
 ├── workspace/
-│   ├── secrets/api_keys.txt  # FAKE-KEY-DO-NOT-USE
-│   └── data/sales.csv        # benign data; indirect-injection variant hides here
-├── sandbox_io/               # scratch dir for sandboxed scripts (mounted)
-├── solutions/
-│   └── code_agent_hardened.py
+│   ├── secrets/api_keys.txt     # FAKE-KEY-DO-NOT-USE
+│   └── data/sales.csv           # benign data; indirect-injection variant hides here
+├── sandbox_io/                  # scratch dir for sandboxed scripts (mounted)
+├── code_agent_hardened.py       # all four controls — INSTRUCTOR ONLY, omit from student distribution
 └── README.md
 ```
 
 ## Quick start
 
 ```bash
-ORCHESTRATOR_MODEL=qwen2.5:3b docker compose run --rm agent python check_env.py
+$env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
+docker compose run --rm agent python check_env.py
 
 # benign
 docker compose run --rm agent python code_agent.py "What's the standard deviation of [4, 8, 15, 16, 23, 42]?"
@@ -54,7 +53,7 @@ docker compose run --rm agent python code_agent.py "What's the standard deviatio
 docker compose run --rm agent python code_agent.py "$(cat attacks/rce_direct.txt)"
 
 # DEFEND: the AST-scoped evaluator refuses os.popen outright
-docker compose run --rm agent python defenses/capability_scope.py
+docker compose run --rm agent python defenses-capability_scope.py
 ```
 
 ## Notes

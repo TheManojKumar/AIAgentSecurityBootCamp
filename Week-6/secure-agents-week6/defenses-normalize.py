@@ -1,4 +1,4 @@
-# defenses/normalize.py — close the encoding-injection gap Garak found
+# defenses-normalize.py — close the encoding-injection gap Garak found
 #
 # Garak's encoding probe smuggles injections past a keyword screen using base64,
 # hex, rot13, unicode escapes, etc. Normalize/decode BEFORE the guardrail so the
@@ -8,9 +8,18 @@ import binascii
 import codecs
 import re
 import unicodedata
+from tracing import init_tracing
+
+init_tracing("week6-defenses-normalize")
 
 
 def _try_base64(s: str) -> str:
+
+    # Log this function call in Magenta color
+    print('\033[95m', "=================================================================")
+    print('\033[95m', "Calling _try_base64 ...")
+    print('\033[95m', "=================================================================")
+
     try:
         # only decode long-ish base64-looking runs
         for m in re.findall(r"[A-Za-z0-9+/]{16,}={0,2}", s):
@@ -28,6 +37,12 @@ def _try_base64(s: str) -> str:
 def normalize(text: str) -> str:
     """Return an expanded string with likely-encoded payloads decoded inline,
     so downstream screening sees the plaintext intent."""
+
+    # Log this function call in Magenta color
+    print('\033[95m', "=================================================================")
+    print('\033[95m', "Calling normalize ...")
+    print('\033[95m', "=================================================================")
+
     s = unicodedata.normalize("NFKC", text)
     # rot13
     try:

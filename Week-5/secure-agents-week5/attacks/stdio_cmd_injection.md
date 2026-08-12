@@ -21,4 +21,4 @@ GPT Researcher, LiteLLM).
 ## The fix (Layer 4)
 Never pass agent/model-supplied params into a shell. Validate, and use an
 `argv` list with `shell=False`, so the crafted parameter is treated as a literal
-string, not a command. See `defenses/param_validation.py`.
+string, not a command. See `defenses-param_validation.py`.

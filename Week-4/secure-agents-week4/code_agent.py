@@ -21,6 +21,12 @@ llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
 @tool
 def run_python(code: str) -> str:
     """Execute Python code to help answer data/analysis questions."""
+
+    # Log this function call in Red color
+    print('\033[31m', "=================================================================")
+    print('\033[31m', "Calling run_python ...")
+    print('\033[31m', "=================================================================")
+
     import io
     import contextlib
     buf = io.StringIO()
@@ -36,4 +42,13 @@ agent = create_react_agent(llm, tools=[run_python],
 if __name__ == "__main__":
     user_msg = sys.argv[1] if len(sys.argv) > 1 else \
         "What's the standard deviation of [4, 8, 15, 16, 23, 42]?"
-    print(agent.invoke({"messages": [("user", user_msg)]})["messages"][-1].content)
+
+    # Log this function call in Yellow color
+    print('\033[33m', "=================================================================")
+    print('\033[33m', "Running code_agent with user_msg: " + user_msg)
+    print('\033[33m', "=================================================================")
+
+    result = agent.invoke({"messages": [("user", user_msg)]})
+
+    # Print the output message in Cyan color
+    print('\033[96m', result["messages"][-1].content)

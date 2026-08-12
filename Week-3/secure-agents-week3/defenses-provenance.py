@@ -1,4 +1,4 @@
-# defenses/provenance.py — Layer 1: provenance tagging on ingestion
+# defenses-provenance.py — Layer 1: provenance tagging on ingestion
 #
 # Every document carries a trust label; retrieval can filter on it. Untrusted /
 # user-supplied docs get {"source": "untrusted"} and are excluded from
@@ -7,14 +7,23 @@ import os
 import hashlib
 import chromadb
 from langchain_ollama import OllamaEmbeddings
+from tracing import init_tracing
+
+init_tracing("week3-defenses-provenance")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 emb = OllamaEmbeddings(model=os.environ.get("EMBED_MODEL", "all-minilm"), base_url=OLLAMA_HOST)
-client = chromadb.PersistentClient(path="/workspace/chroma")
+client = chromadb.PersistentClient(path="workspace/chroma")
 col = client.get_or_create_collection("policies")
 
 
 def add_document(doc: str, doc_id: str, source: str = "untrusted", ingested_by: str = "system"):
+
+    # Log this function call in Red color
+    print('\033[31m', "=================================================================")
+    print('\033[31m', "Calling add_document with doc_id: " + doc_id)
+    print('\033[31m', "=================================================================")
+
     h = hashlib.sha256(doc.encode()).hexdigest()
     col.upsert(
         documents=[doc],
@@ -25,6 +34,12 @@ def add_document(doc: str, doc_id: str, source: str = "untrusted", ingested_by: 
 
 
 def retrieve_trusted(query, k=3):
+
+    # Log this function call in Green color
+    print('\033[92m', "=================================================================")
+    print('\033[92m', "Calling retrieve_trusted with query: " + query)
+    print('\033[92m', "=================================================================")
+
     res = col.query(query_embeddings=[emb.embed_query(query)], n_results=k,
                     where={"source": "official"})
     return res["documents"][0] if res["documents"] else []

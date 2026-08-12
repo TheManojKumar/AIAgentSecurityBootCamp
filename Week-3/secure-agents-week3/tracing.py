@@ -1,15 +1,20 @@
-"""Phoenix tracing auto-configuration (shared across weeks)."""
-import os
+"""Phoenix tracing auto-configuration.
+
+Import init_tracing() at the top of any agent entrypoint to get automatic
+LangChain/LangGraph instrumentation. No manual span code required.
+"""
 
 
 def init_tracing(project_name: str = "week3"):
     try:
         from phoenix.otel import register
-        endpoint = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT")
-        kwargs = {"project_name": project_name, "auto_instrument": True}
-        if endpoint:
-            kwargs["endpoint"] = endpoint
-        return register(**kwargs)
+        from openinference.instrumentation.langchain import LangChainInstrumentor
+
+        tracer_provider = register(project_name=project_name)
+        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+        return tracer_provider
     except Exception as e:
+        import traceback
         print(f"[tracing] Phoenix not initialised ({e}); continuing without traces.")
+        traceback.print_exc()
         return None

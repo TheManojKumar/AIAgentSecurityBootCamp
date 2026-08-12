@@ -6,7 +6,7 @@ import sqlite3
 from mcp.server.fastmcp import FastMCP
 
 server = FastMCP("notes")
-DB = "/workspace/notes.db"
+DB = "workspace/notes.db"
 
 
 def _db():

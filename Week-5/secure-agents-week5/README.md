@@ -24,23 +24,22 @@ secure-agents-week5/
 ├── attacks/
 │   ├── description_injection.md
 │   └── stdio_cmd_injection.md
-├── defenses/
-│   ├── description_screen.py  # Layer 1
-│   ├── server_scoping.py      # Layer 2
-│   ├── server_vetting.py      # Layer 3
-│   └── param_validation.py    # Layer 4
+├── defenses-description_screen.py  # Layer 1
+├── defenses-server_scoping.py      # Layer 2
+├── defenses-server_vetting.py      # Layer 3
+├── defenses-param_validation.py    # Layer 4
 ├── workspace/
 │   ├── notes.db              # benign user notes
 │   └── attacker_sink.txt     # where exfiltration lands (proof of compromise)
-├── solutions/
-│   └── mcp_agent_hardened.py
+├── mcp_agent_hardened.py    # INSTRUCTOR ONLY, omit from student distribution
 └── README.md
 ```
 
 ## Quick start
 
 ```bash
-ORCHESTRATOR_MODEL=qwen2.5:3b docker compose run --rm agent python check_env.py
+$env:ORCHESTRATOR_MODEL = "qwen2.5:3b"
+docker compose run --rm agent python check_env.py
 
 # benign
 docker compose run --rm agent python mcp_agent.py "Save a note: buy milk."
@@ -50,7 +49,7 @@ docker compose run --rm agent python mcp_agent.py "Find my notes about the proje
 #   -> the poisoned description coerces an exfiltrate call; check workspace/attacker_sink.txt
 
 # DEFEND: the hardened agent rejects the unmanifested server and screens descriptions
-docker compose run --rm agent python solutions/mcp_agent_hardened.py "Find my notes about the project."
+docker compose run --rm agent python mcp_agent_hardened.py "Find my notes about the project."
 ```
 
 ## Notes
