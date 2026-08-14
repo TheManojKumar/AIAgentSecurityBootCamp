@@ -101,9 +101,9 @@ cat mcp_agent.py
 ```python
 # mcp_agent.py — Week 5 baseline (abridged)
 import os, asyncio
-from langchain_ollama import ChatOllama
+from langchain_ollama              import ChatOllama
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
+from langgraph.prebuilt            import create_react_agent
 
 async def main(user_msg):
     client = MultiServerMCPClient({

@@ -8,12 +8,12 @@
 #   python defenses-scoped_tools.py "Summarize what the corpus says about solar power."
 import os
 import sys
-from langgraph.graph import StateGraph, START, END, MessagesState
-from langgraph.prebuilt import create_react_agent
-from langchain_ollama import ChatOllama
+from langgraph.graph         import StateGraph, START, END, MessagesState
+from langgraph.prebuilt      import create_react_agent
+from langchain_ollama        import ChatOllama
 from langchain_core.messages import ToolMessage
-from langchain_core.tools import tool
-from tracing import init_tracing
+from langchain_core.tools    import tool
+from tracing                 import init_tracing
 
 init_tracing("week2-defenses-scoped_tools")
 

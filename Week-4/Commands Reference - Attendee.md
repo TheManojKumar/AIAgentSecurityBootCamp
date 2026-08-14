@@ -61,8 +61,8 @@ cat code_agent.py
 ```python
 # code_agent.py — Week 4 vulnerable baseline (abridged)
 import os
-from langgraph.prebuilt import create_react_agent
-from langchain_ollama import ChatOllama
+from langgraph.prebuilt   import create_react_agent
+from langchain_ollama     import ChatOllama
 from langchain_core.tools import tool
 
 llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),

@@ -101,11 +101,11 @@ cat team.py
 ```python
 # team.py — Week 2 vulnerable baseline (abridged)
 import os
-from langgraph.graph import StateGraph, START, END, MessagesState
-from langgraph.prebuilt import create_react_agent
-from langchain_ollama import ChatOllama
+from langgraph.graph         import StateGraph, START, END, MessagesState
+from langgraph.prebuilt      import create_react_agent
+from langchain_ollama        import ChatOllama
 from langchain_core.messages import ToolMessage
-from langchain_core.tools import tool
+from langchain_core.tools    import tool
 
 llm  = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
                   base_url=os.environ.get("OLLAMA_HOST"), temperature=0)

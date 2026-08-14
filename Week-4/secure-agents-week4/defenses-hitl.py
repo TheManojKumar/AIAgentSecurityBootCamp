@@ -3,7 +3,7 @@
 # Use LangGraph's interrupt to require human approval for any code-exec call,
 # showing the EXACT code. High-blast-radius actions deserve a human checkpoint.
 from langgraph.types import interrupt
-from tracing import init_tracing
+from tracing         import init_tracing
 
 from docker_sandbox import run_python as sandboxed_exec
 

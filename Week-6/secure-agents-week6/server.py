@@ -6,7 +6,7 @@ import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from secure_system import handle
-from tracing import init_tracing
+from tracing       import init_tracing
 
 init_tracing("week6-server")
 

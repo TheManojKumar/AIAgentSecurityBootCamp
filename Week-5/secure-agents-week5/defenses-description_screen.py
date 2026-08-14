@@ -5,7 +5,7 @@
 # summary).
 import os
 from langchain_ollama import ChatOllama
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week5-defenses-description_screen")
 

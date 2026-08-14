@@ -10,11 +10,11 @@
 #   python defenses-output_schema.py "Summarize what the corpus says about solar power."
 import os
 import sys
-from pydantic import BaseModel
-from langgraph.graph import StateGraph, START, END, MessagesState
-from langchain_ollama import ChatOllama
+from pydantic             import BaseModel
+from langgraph.graph      import StateGraph, START, END, MessagesState
+from langchain_ollama     import ChatOllama
 from langchain_core.tools import tool
-from tracing import init_tracing
+from tracing              import init_tracing
 
 init_tracing("week2-defenses-output_schema")
 

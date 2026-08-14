@@ -13,7 +13,7 @@
 import os
 import sys
 from langchain_ollama import ChatOllama
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week6")
 

@@ -6,9 +6,9 @@
 # text.
 import os
 import json
-from datetime import datetime, timezone
+from datetime         import datetime, timezone
 from langchain_ollama import ChatOllama
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week3-defenses-memory_guard")
 

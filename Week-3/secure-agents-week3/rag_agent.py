@@ -8,7 +8,7 @@ import os
 import sys
 import chromadb
 from langchain_ollama import ChatOllama, OllamaEmbeddings
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week3")
 

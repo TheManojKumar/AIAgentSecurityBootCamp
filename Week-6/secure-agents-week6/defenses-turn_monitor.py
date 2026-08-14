@@ -5,7 +5,7 @@
 # sensitivity, or a request that only becomes dangerous in the context of prior
 # turns.
 from dataclasses import dataclass, field
-from tracing import init_tracing
+from tracing     import init_tracing
 
 init_tracing("week6-defenses-turn_monitor")
 

@@ -5,8 +5,8 @@
 # refuses path traversal. Defense in depth — this holds even if Layers 1 and 2
 # are bypassed.
 import os
-from langchain_core.tools   import tool
-from tracing                import init_tracing
+from langchain_core.tools import tool
+from tracing              import init_tracing
 
 init_tracing("week1-defenses-tool_validation")
 

@@ -7,10 +7,10 @@
 
 import os
 import sys
-from langgraph.prebuilt     import create_react_agent
-from langchain_ollama       import ChatOllama
-from langchain_core.tools   import tool
-from tracing                import init_tracing
+from langgraph.prebuilt   import create_react_agent
+from langchain_ollama     import ChatOllama
+from langchain_core.tools import tool
+from tracing              import init_tracing
 
 init_tracing("week1-defenses-allowlist")
 

@@ -4,8 +4,8 @@
 # classifies the request; malicious input is blocked upstream.
 import os
 import sys
-from langchain_ollama       import ChatOllama
-from tracing                import init_tracing
+from langchain_ollama import ChatOllama
+from tracing          import init_tracing
 
 init_tracing("week1-defenses-guardrail")
 

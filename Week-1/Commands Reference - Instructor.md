@@ -113,8 +113,8 @@ cat agent.py
 ```python
 # agent.py — Week 1 vulnerable baseline
 import os
-from langgraph.prebuilt import create_react_agent
-from langchain_ollama import ChatOllama
+from langgraph.prebuilt   import create_react_agent
+from langchain_ollama     import ChatOllama
 from langchain_core.tools import tool
 
 llm = ChatOllama(

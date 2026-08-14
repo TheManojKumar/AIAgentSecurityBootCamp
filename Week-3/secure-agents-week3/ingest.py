@@ -7,7 +7,7 @@ import os
 import glob
 import chromadb
 from langchain_ollama import OllamaEmbeddings
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week3")
 

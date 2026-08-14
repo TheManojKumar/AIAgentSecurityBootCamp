@@ -11,10 +11,10 @@ import os
 import sys
 import json
 import hashlib
-from datetime import datetime, timezone
+from datetime         import datetime, timezone
 import chromadb
 from langchain_ollama import ChatOllama, OllamaEmbeddings
-from tracing import init_tracing
+from tracing          import init_tracing
 
 init_tracing("week3-hardened")
 

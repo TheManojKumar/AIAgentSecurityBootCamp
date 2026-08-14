@@ -7,10 +7,10 @@
 import os
 import sys
 import asyncio
-from langchain_ollama import ChatOllama
+from langchain_ollama              import ChatOllama
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
-from tracing import init_tracing
+from langgraph.prebuilt            import create_react_agent
+from tracing                       import init_tracing
 
 init_tracing("week5")
 

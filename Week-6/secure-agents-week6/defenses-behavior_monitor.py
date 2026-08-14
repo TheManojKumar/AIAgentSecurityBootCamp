@@ -4,7 +4,7 @@
 # calling exfiltrate, an agent appending hidden directives to every response, or
 # tool-call rates far outside the baseline.
 from dataclasses import dataclass, field
-from tracing import init_tracing
+from tracing     import init_tracing
 
 init_tracing("week6-defenses-behavior_monitor")
 
