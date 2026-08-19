@@ -5,9 +5,9 @@ import json
 import urllib.request
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-ORCH = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
-EMBED = os.environ.get("EMBED_MODEL", "all-minilm")
-PHOENIX = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006")
+ORCH        = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
+EMBED       = os.environ.get("EMBED_MODEL", "all-minilm")
+PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006")
 
 
 def _tags():

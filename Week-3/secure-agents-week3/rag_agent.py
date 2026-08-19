@@ -33,6 +33,7 @@ def retrieve(query: str, k: int = 3) -> list[str]:
     print('\033[31m', "=================================================================")
 
     qv = emb.embed_query(query)
+    # default value for k is 3, but we have only 2 documents in the corpus, so we will get only 2 results and a warning
     res = col.query(query_embeddings=[qv], n_results=k)
     return res["documents"][0]      # no provenance check — that's the vuln
 
