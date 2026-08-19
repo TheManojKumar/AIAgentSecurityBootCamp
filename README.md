@@ -1,4 +1,4 @@
-# Securing Local AI Agents
+# Securing AI Agents
 ### A Six-Week, Hands-On, Build → Attack → Defend Course (Self-Paced & Teachable)
 
 ---
