@@ -35,7 +35,6 @@ secure-agents-week4/
 ├── workspace/
 │   ├── secrets/api_keys.txt     # FAKE-KEY-DO-NOT-USE
 │   └── data/sales.csv           # benign data; indirect-injection variant hides here
-├── sandbox_io/                  # scratch dir for sandboxed scripts (mounted)
 ├── code_agent_hardened.py       # all four controls — INSTRUCTOR ONLY, omit from student distribution
 └── README.md
 ```

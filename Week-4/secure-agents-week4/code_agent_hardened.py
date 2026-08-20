@@ -9,11 +9,9 @@
 # For the constrained-math path we route arithmetic to safe_eval and only fall
 # through to the gated+sandboxed exec for genuinely general code.
 # Ships to instructors only; omit this file from the student distribution.
-import os
 import sys
 import shutil
 import subprocess
-import tempfile
 from tracing import init_tracing
 
 init_tracing("week4-hardened")
@@ -27,21 +25,16 @@ def sandboxed_exec(code: str) -> str:
     print('\033[31m', "Calling sandboxed_exec ...")
     print('\033[31m', "=================================================================")
 
-    with tempfile.NamedTemporaryFile("w", suffix=".py", dir="/sandbox_io", delete=False) as f:
-        f.write(code)
-        script = os.path.basename(f.name)
-    try:
-        out = subprocess.run([
-            "docker", "run", "--rm", "--network", "none", "--read-only",
-            "--cap-drop", "ALL", "--pids-limit", "64",
-            "--memory", "256m", "--cpus", "0.5",
-            "--security-opt", "no-new-privileges",
-            "-v", f"/sandbox_io/{script}:/run/{script}:ro",
-            "python:3.12-slim", "timeout", "5", "python", f"/run/{script}"
-        ], capture_output=True, text=True, timeout=15)
-        return (out.stdout or "") + (out.stderr or "")
-    finally:
-        os.unlink(f"/sandbox_io/{script}")
+    # The code is piped to the sandbox over STDIN — no shared files or volumes,
+    # so this works identically under Docker-out-of-Docker on any host OS.
+    out = subprocess.run([
+        "docker", "run", "--rm", "-i", "--network", "none", "--read-only",
+        "--cap-drop", "ALL", "--pids-limit", "64",
+        "--memory", "256m", "--cpus", "0.5",
+        "--security-opt", "no-new-privileges",
+        "python:3.12-slim", "timeout", "5", "python", "-"
+    ], input=code, capture_output=True, text=True, timeout=15)
+    return (out.stdout or "") + (out.stderr or "")
 
 
 # --- Layer 2: fail closed ---

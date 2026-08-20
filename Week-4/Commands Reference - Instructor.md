@@ -165,26 +165,21 @@ Map each to what students just did by hand.
 ### Layer 1 — Real sandboxing: ephemeral, network-less, resource-capped container (`defenses-docker_sandbox.py`)
 Execute model code in a throwaway container — never in-process.
 ```python
-import subprocess, tempfile, os
+import subprocess
 def run_python(code: str) -> str:
-    with tempfile.NamedTemporaryFile("w", suffix=".py", dir="/sandbox_io", delete=False) as f:
-        f.write(code); script = os.path.basename(f.name)
-    try:
-        out = subprocess.run([
-            "docker", "run", "--rm",
-            "--network", "none",            # no exfiltration / SSRF
-            "--read-only",                  # immutable FS
-            "--cap-drop", "ALL",            # no privileged syscalls
-            "--pids-limit", "64",
-            "--memory", "256m", "--cpus", "0.5",
-            "--security-opt", "no-new-privileges",
-            "-v", f"/sandbox_io/{script}:/run/{script}:ro",
-            "python:3.12-slim", "timeout", "5", "python", f"/run/{script}"
-        ], capture_output=True, text=True, timeout=15)
-        return (out.stdout or "") + (out.stderr or "")
-    finally:
-        os.unlink(f"/sandbox_io/{script}")
+    out = subprocess.run([
+        "docker", "run", "--rm", "-i",  # -i: the code arrives on stdin
+        "--network", "none",            # no exfiltration / SSRF
+        "--read-only",                  # immutable FS
+        "--cap-drop", "ALL",            # no privileged syscalls
+        "--pids-limit", "64",
+        "--memory", "256m", "--cpus", "0.5",
+        "--security-opt", "no-new-privileges",
+        "python:3.12-slim", "timeout", "5", "python", "-"
+    ], input=code, capture_output=True, text=True, timeout=15)
+    return (out.stdout or "") + (out.stderr or "")
 ```
+The code is piped to the sandbox over **stdin** (`python -`) — no shared files or volumes, so it works identically under Docker-out-of-Docker on any host OS.
 ```bash
 docker compose run --rm agent python defenses-docker_sandbox.py "$(cat attacks/rce_direct.txt)"
 ```
@@ -204,21 +199,25 @@ docker compose run --rm agent python defenses-fail_closed.py "$(cat attacks/rce_
 > **Say:** "This one line is the entire CrewAI CVE. Fail closed, not open."
 
 ### Layer 3 — Human-in-the-loop gate before code runs (`defenses-hitl.py`)
-LangGraph `interrupt` to require human approval, showing the exact code.
+Require human approval, showing the EXACT code, before any exec. Production uses LangGraph's `interrupt` to pause the graph and resume on the human's decision; the lab uses the equivalent CLI stand-in, which treats "no interactive human" as **deny** (fail closed):
 ```python
-from langgraph.types import interrupt
-def code_gate(state):
-    code = state["pending_code"]
-    decision = interrupt({"action": "run_python", "code": code,
-                          "prompt": "Approve execution of this code? (yes/no)"})
-    if decision != "yes":
-        return {"messages": [("system", "[Execution denied by human reviewer.]")]}
-    return {"messages": [("tool", sandboxed_exec(code))]}
+def human_approves(code: str) -> bool:
+    print(code)                       # surface the exact code first
+    try:
+        return input("> ").strip().lower() == "yes"
+    except EOFError:
+        return False                  # no interactive human → deny (fail closed)
+
+@tool
+def run_python(code: str) -> str:
+    if not human_approves(code):
+        return "[Execution denied by human reviewer.]"
+    return sandboxed_exec(code)        # Layer 1, inlined
 ```
 ```bash
 docker compose run --rm agent python defenses-hitl.py "$(cat attacks/rce_direct.txt)"
 ```
-→ The malicious code is surfaced to a human, who rejects it.
+> **Say:** "The malicious code is surfaced for review; with no TTY under `docker compose run`, it is rejected — fail closed."
 
 ### Layer 4 — Capability scoping & allow-listed operations (`defenses-capability_scope.py`)
 If the real need is "math," don't grant "arbitrary Python." Offer a constrained evaluator (no imports, no dunders, AST-allow-listed).
@@ -281,7 +280,6 @@ secure-agents-week4/
 ├── workspace/
 │   ├── secrets/api_keys.txt    # FAKE-KEY-DO-NOT-USE
 │   └── data/sales.csv          # benign analysis data; indirect variant hides here
-├── sandbox_io/                 # scratch dir for sandboxed scripts (mounted)
 └── code_agent_hardened.py      # all four layers — INSTRUCTOR ONLY, omit from student distribution
 ```
 **Docker-out-of-Docker:** the agent container mounts the host's `/var/run/docker.sock` to spawn the *sibling* sandbox container (network-less/read-only/cap-dropped). The host is never targeted — the demonstrated shell-out runs in the agent container (vulnerable demo) or the disposable sandbox (defended demo), both throwaway, both fake-data-only. A gVisor/`runsc` alternative is noted as [STRETCH] for stricter setups.
