@@ -224,12 +224,16 @@ If the real need is "math," don't grant "arbitrary Python." Offer a constrained 
 ```bash
 docker compose run --rm agent python defenses-capability_scope.py "$(cat attacks/rce_direct.txt)"
 ```
-→ `os.popen` won't even parse. *(Right tool for the job beats sandboxing the wrong tool.)*
+→ The safe math evaluates (`18.0`), while the injected `os.popen` payload won't even parse (`DENIED`). *(Right tool for the job beats sandboxing the wrong tool.)*
 
 ### The full hardened agent (instructor copy, not distributed to students)
 ```bash
 docker compose run --rm agent python code_agent_hardened.py "$(cat attacks/rce_direct.txt)"
 docker compose run --rm agent python code_agent_hardened.py "$(cat attacks/rce_indirect.txt)"
+```
+The RCE payloads aren't valid math, so they fall through Layer 4 to the gated + sandboxed path and are rejected. To see **Layer 4 itself fire**, feed a pure-math request — the constrained evaluator handles it and skips the sandbox *and* the human gate entirely (`Gate decision: capability-scoped (safe math evaluator, no exec)`):
+```bash
+docker compose run --rm agent python code_agent_hardened.py "sum([4,8,15,16,23,42]) / 6"
 ```
 
 ---

@@ -10,7 +10,9 @@
 # through to the gated+sandboxed exec for genuinely general code.
 # Ships to instructors only; omit this file from the student distribution.
 import sys
+import ast
 import shutil
+import operator
 import subprocess
 from tracing import init_tracing
 
@@ -75,12 +77,70 @@ def human_approves(code: str) -> bool:
     return approved
 
 
+# --- Layer 4: capability scoping (constrained math evaluator) ---
+# If the request is provably just allow-listed arithmetic, evaluate it here — no
+# imports, no dunders, no exec (os.popen won't even parse). Inlined from
+# defenses-capability_scope.py because the hyphenated filename isn't importable.
+_ALLOWED_FUNCS = {
+    "sum": sum, "len": len, "min": min, "max": max, "abs": abs, "round": round,
+}
+
+_BINOPS = {
+    ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul,
+    ast.Div: operator.truediv, ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod, ast.Pow: operator.pow,
+}
+
+
+def safe_eval(expr: str):
+    """Evaluate a math expression with an allow-listed subset of Python."""
+    tree = ast.parse(expr, mode = "eval")
+
+    def _eval(node):
+        if isinstance(node, ast.Expression):
+            return _eval(node.body)
+        if isinstance(node, ast.Constant):
+            return node.value
+        if isinstance(node, ast.BinOp) and type(node.op) in _BINOPS:
+            return _BINOPS[type(node.op)](_eval(node.left), _eval(node.right))
+        if isinstance(node, ast.UnaryOp):
+            v = _eval(node.operand)
+            return -v if isinstance(node.op, ast.USub) else +v
+        if isinstance(node, (ast.List, ast.Tuple)):
+            return [_eval(e) for e in node.elts]
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) \
+                and node.func.id in _ALLOWED_FUNCS:
+            return _ALLOWED_FUNCS[node.func.id](*[_eval(a) for a in node.args])
+        raise ValueError("operation not permitted")
+
+    return _eval(tree)
+
+
+def try_safe_math(code: str):
+    """If `code` is a pure allow-listed arithmetic expression, evaluate it.
+    Returns (True, "<result>") on success, (False, None) otherwise."""
+    try:
+        return True, str(safe_eval(code))
+    except Exception:
+        return False, None
+
+
 def guarded_run(code: str) -> str:
 
     # Log this function call in Magenta color
     print('\033[95m', "=================================================================")
     print('\033[95m', "Calling guarded_run ...")
     print('\033[95m', "=================================================================")
+
+    # Layer 4 — capability scoping: if this is provably just allow-listed math,
+    # evaluate it in the constrained evaluator. No dangerous capability is needed,
+    # so it skips the sandbox and human gate entirely. Only genuinely general code
+    # falls through to Layers 2 / 3 / 1 below.
+    ok, value = try_safe_math(code)
+    if ok:
+        # Log the decision in Magenta color
+        print('\033[95m', "Gate decision: capability-scoped (safe math evaluator, no exec)")
+        return value
 
     if not docker_available():
         # Log the decision in Magenta color
@@ -96,9 +156,11 @@ def guarded_run(code: str) -> str:
 
 
 if __name__ == "__main__":
-    # Demo: feed the direct-RCE payload; the gate surfaces it and the sandbox
-    # contains it even if approved.
-    code = sys.argv[1] if len(sys.argv) > 1 else "print(sum([4,8,15,16,23,42])/6)"
+    # Demo: with no argument, a pure-math request is handled by Layer 4's
+    # constrained evaluator (no sandbox / no human gate). Pass an RCE payload as
+    # argv[1] (e.g. "$(cat attacks/rce_direct.txt)") to watch it fail the math
+    # allow-list and fall through to the gated + sandboxed path instead.
+    code = sys.argv[1] if len(sys.argv) > 1 else "sum([4,8,15,16,23,42]) / 6"
 
     # Log this function call in Yellow color
     print('\033[33m', "=================================================================")

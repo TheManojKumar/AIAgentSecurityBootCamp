@@ -177,7 +177,7 @@ If the real need is "math," don't grant "arbitrary Python." Offer a constrained 
 ```bash
 docker compose run --rm agent python defenses-capability_scope.py "$(cat attacks/rce_direct.txt)"
 ```
-→ `os.popen` won't even parse. *(Right tool for the job beats sandboxing the wrong tool.)*
+→ The safe math evaluates (`18.0`), while the injected `os.popen` payload won't even parse (`DENIED`). *(Right tool for the job beats sandboxing the wrong tool.)*
 
 ---
 

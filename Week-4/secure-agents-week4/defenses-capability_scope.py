@@ -4,21 +4,12 @@
 # constrained evaluator (no imports, no dunders, AST-allow-listed) instead of
 # exec. os.popen won't even parse. Right tool for the job beats sandboxing the
 # wrong tool.
+import sys
 import ast
 import operator
 from tracing import init_tracing
 
 init_tracing("week4-defenses-capability_scope")
-
-# Only these AST node types are permitted — no Import, Call to arbitrary names,
-# Attribute access (dunders), etc.
-_ALLOWED_NODES = (
-    ast.Expression, ast.Module, ast.Expr,
-    ast.BinOp, ast.UnaryOp, ast.Num, ast.Constant,
-    ast.Add, ast.Sub, ast.Mult, ast.Div, ast.FloorDiv, ast.Mod, ast.Pow,
-    ast.USub, ast.UAdd,
-    ast.List, ast.Tuple, ast.Load,
-)
 
 _ALLOWED_FUNCS = {
     "sum": sum, "len": len, "min": min, "max": max, "abs": abs, "round": round,
@@ -80,6 +71,11 @@ def run_math(expr: str) -> str:
 
 
 if __name__ == "__main__":
+    # The second expression is the one under test: pass a payload as argv[1]
+    # (the ref feeds it "$(cat attacks/rce_direct.txt)", which won't parse as a
+    # math expression → DENIED). With no argument it defaults to the dunder-escape
+    # example so the allowed/denied contrast still shows.
+    under_test = sys.argv[1] if len(sys.argv) > 1 else "__import__('os').popen('id').read()"
 
     # Log this function call in Yellow color
     print('\033[33m', "=================================================================")
@@ -87,5 +83,5 @@ if __name__ == "__main__":
     print('\033[33m', "=================================================================")
 
     # Print the output message in Cyan color
-    print('\033[96m', run_math("sum([4,8,15,16,23,42]) / 6"))          # allowed
-    print('\033[96m', run_math("__import__('os').popen('id').read()"))  # DENIED
+    print('\033[96m', run_math("sum([4,8,15,16,23,42]) / 6"))  # allowed — evaluator works
+    print('\033[96m', run_math(under_test))                    # under test → DENIED
