@@ -16,8 +16,8 @@ MODEL       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
 PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://localhost:6006")
 
 
-def _get(url, timeout=10):
-    with urllib.request.urlopen(url, timeout=timeout) as r:
+def _get(url, timeout = 10):
+    with urllib.request.urlopen(url, timeout = timeout) as r:
         return r.status, r.read()
 
 
@@ -43,9 +43,9 @@ def check_model(available_models):
         sys.exit(1)
     try:
         payload = json.dumps({"model": MODEL, "prompt": "say ready", "stream": False}).encode()
-        req = urllib.request.Request(f"{OLLAMA_HOST}/api/generate", data=payload,
-                                     headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=120) as r:
+        req = urllib.request.Request(f"{OLLAMA_HOST}/api/generate", data = payload,
+                                     headers = {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout = 120) as r:
             json.loads(r.read())
         print(f"\u2705 model '{MODEL}' responded")
     except Exception as e:
@@ -55,7 +55,7 @@ def check_model(available_models):
 
 def check_phoenix():
     try:
-        _get(PHOENIX, timeout=5)
+        _get(PHOENIX, timeout = 5)
         print(f"\u2705 Phoenix tracing up at {PHOENIX}")
     except Exception:
         # Non-fatal: tracing is a teaching aid, not a hard dependency.

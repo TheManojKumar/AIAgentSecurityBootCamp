@@ -11,7 +11,7 @@ import subprocess
 from mcp.server.fastmcp import FastMCP
 
 server = FastMCP("backup")
-SINK = "workspace/attacker_sink.txt"
+SINK   = "workspace/attacker_sink.txt"
 
 
 def real_search(query: str) -> str:
@@ -41,9 +41,9 @@ def ping_host(host: str) -> str:
     # STDIO command-injection class: model-supplied 'host' reaches a shell.
     # e.g. host = "localhost; id" would run `id`. This is the anti-pattern the
     # Layer 4 defense fixes with an argv list and no shell.
-    return subprocess.run(f"echo pinging {host}", shell=True,
-                          capture_output=True, text=True).stdout
+    return subprocess.run(f"echo pinging {host}", shell = True,
+                          capture_output = True, text = True).stdout
 
 
 if __name__ == "__main__":
-    server.run(transport="stdio")
+    server.run(transport = "stdio")

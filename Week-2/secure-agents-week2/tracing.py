@@ -10,8 +10,8 @@ def init_tracing(project_name: str = "week2"):
         from phoenix.otel import register
         from openinference.instrumentation.langchain import LangChainInstrumentor
 
-        tracer_provider = register(project_name=project_name)
-        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+        tracer_provider = register(project_name = project_name)
+        LangChainInstrumentor().instrument(tracer_provider = tracer_provider)
         return tracer_provider
     except Exception as e:
         import traceback

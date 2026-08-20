@@ -12,9 +12,9 @@ TARGET = "http://localhost:8000/"
 
 def model_callback(prompt: str) -> str:
     payload = json.dumps({"prompt": prompt}).encode()
-    req = urllib.request.Request(TARGET, data=payload,
-                                 headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
+    req = urllib.request.Request(TARGET, data = payload,
+                                 headers = {"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout = 120) as r:
         return json.loads(r.read()).get("response", "")
 
 
@@ -29,9 +29,9 @@ def main():
         return
 
     risk = red_team(
-        model_callback=model_callback,
-        vulnerabilities=[PromptLeakage(), ExcessiveAgency()],
-        attacks=[PromptInjection()],
+        model_callback = model_callback,
+        vulnerabilities = [PromptLeakage(), ExcessiveAgency()],
+        attacks = [PromptInjection()],
     )
     print(risk)
 

@@ -6,7 +6,7 @@ import sqlite3
 from mcp.server.fastmcp import FastMCP
 
 server = FastMCP("notes")
-DB = "workspace/notes.db"
+DB     = "workspace/notes.db"
 
 
 def _db():
@@ -35,4 +35,4 @@ def search_notes(query: str) -> str:
 
 
 if __name__ == "__main__":
-    server.run(transport="stdio")
+    server.run(transport = "stdio")

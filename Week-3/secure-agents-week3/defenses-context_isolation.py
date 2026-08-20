@@ -11,8 +11,8 @@ from tracing          import init_tracing
 init_tracing("week3-defenses-context_isolation")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-llm         = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                         base_url=OLLAMA_HOST, temperature=0)
+llm         = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                         base_url = OLLAMA_HOST, temperature = 0)
 
 
 def build_prompt(trusted: str, untrusted: str, query: str) -> str:

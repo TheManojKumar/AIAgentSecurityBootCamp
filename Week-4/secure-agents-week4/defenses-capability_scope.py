@@ -39,7 +39,7 @@ def safe_eval(expr: str):
     print('\033[95m', "Calling safe_eval ...")
     print('\033[95m', "=================================================================")
 
-    tree = ast.parse(expr, mode="eval")
+    tree = ast.parse(expr, mode = "eval")
 
     def _eval(node):
         if isinstance(node, ast.Expression):

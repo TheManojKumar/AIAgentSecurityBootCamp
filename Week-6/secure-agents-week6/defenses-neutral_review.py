@@ -27,7 +27,7 @@ def neutral_review_payload(tool: str, args: dict, raw_code: str = "") -> dict:
 
     code = raw_code
     for pat in PERSUASION_PATTERNS:
-        code = re.sub(pat, "", code, flags=re.IGNORECASE)
+        code = re.sub(pat, "", code, flags = re.IGNORECASE)
 
     # Log the verdict in Magenta color
     print('\033[95m', "Neutral review: persuasive framing stripped; judge the raw action only.")

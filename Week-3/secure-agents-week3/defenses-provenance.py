@@ -14,8 +14,8 @@ from tracing          import init_tracing
 init_tracing("week3-defenses-provenance")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-emb         = OllamaEmbeddings(model=os.environ.get("EMBED_MODEL", "all-minilm"), base_url=OLLAMA_HOST)
-client      = chromadb.PersistentClient(path="workspace/chroma")
+emb         = OllamaEmbeddings(model = os.environ.get("EMBED_MODEL", "all-minilm"), base_url = OLLAMA_HOST)
+client      = chromadb.PersistentClient(path = "workspace/chroma")
 # Isolated demo collection so this single-layer demo is self-contained and does
 # not depend on / clobber the baseline "policies" collection built by ingest.py.
 col         = client.get_or_create_collection("policies_provenance_demo")
@@ -30,22 +30,22 @@ def add_document(doc: str, doc_id: str, source: str = "untrusted", ingested_by: 
 
     h = hashlib.sha256(doc.encode()).hexdigest()
     col.upsert(
-        documents=[doc],
-        embeddings=[emb.embed_query(doc)],
-        metadatas=[{"source": source, "ingested_by": ingested_by, "sha256": h}],
-        ids=[doc_id],
+        documents = [doc],
+        embeddings = [emb.embed_query(doc)],
+        metadatas = [{"source": source, "ingested_by": ingested_by, "sha256": h}],
+        ids = [doc_id],
     )
 
 
-def retrieve_trusted(query, k=3):
+def retrieve_trusted(query, k = 3):
 
     # Log this function call in Green color
     print('\033[92m', "=================================================================")
     print('\033[92m', "Calling retrieve_trusted with query: " + query)
     print('\033[92m', "=================================================================")
 
-    res = col.query(query_embeddings=[emb.embed_query(query)], n_results=k,
-                    where={"source": "official"})
+    res = col.query(query_embeddings = [emb.embed_query(query)], n_results = k,
+                    where = {"source": "official"})
     return res["documents"][0] if res["documents"] else []
 
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     # admin ("official").
     for path in sorted(glob.glob("workspace/corpus/*.txt")):
         add_document(open(path).read(), os.path.basename(path),
-                     source="official", ingested_by="admin")
+                     source = "official", ingested_by = "admin")
     # The poison doc is added WITHOUT source/ingested_by — the safe defaults
     # ("untrusted"/"unknown") take over. So even if an attacker discovers this
     # ingestion path and slips a document in, it lands marked unofficial by

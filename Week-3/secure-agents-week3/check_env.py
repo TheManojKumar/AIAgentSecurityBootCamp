@@ -11,7 +11,7 @@ PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006"
 
 
 def _tags():
-    with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout=10) as r:
+    with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout = 10) as r:
         return {m["name"] for m in json.loads(r.read()).get("models", [])}
 
 
@@ -31,9 +31,9 @@ def main():
     # confirm embeddings actually produce a vector
     try:
         payload = json.dumps({"model": EMBED, "prompt": "hello"}).encode()
-        req = urllib.request.Request(f"{OLLAMA_HOST}/api/embeddings", data=payload,
-                                     headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=60) as r:
+        req = urllib.request.Request(f"{OLLAMA_HOST}/api/embeddings", data = payload,
+                                     headers = {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout = 60) as r:
             vec = json.loads(r.read()).get("embedding", [])
         assert len(vec) > 0
         print("\u2705 embeddings work")
@@ -49,7 +49,7 @@ def main():
         sys.exit(1)
 
     try:
-        urllib.request.urlopen(PHOENIX, timeout=5)
+        urllib.request.urlopen(PHOENIX, timeout = 5)
         print(f"\u2705 Phoenix up at {PHOENIX}")
     except Exception:
         print(f"\u26a0\ufe0f  Phoenix not reachable at {PHOENIX}")

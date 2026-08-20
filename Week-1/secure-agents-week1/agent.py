@@ -13,8 +13,8 @@ from tracing              import init_tracing
 init_tracing("week1")
 
 llm = ChatOllama(
-    model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-    base_url    = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+    model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+    base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
     temperature = 0,
 )
 
@@ -47,7 +47,7 @@ def read_file(path: str) -> str:
 
 SYSTEM = "You are a helpful weather assistant."
 
-agent = create_react_agent(llm, tools=[get_weather, read_file], prompt=SYSTEM)
+agent = create_react_agent(llm, tools = [get_weather, read_file], prompt = SYSTEM)
 
 
 if __name__ == "__main__":

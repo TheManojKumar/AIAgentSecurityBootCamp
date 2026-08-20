@@ -15,8 +15,8 @@ from tracing              import init_tracing
 init_tracing("week1-defenses-allowlist")
 
 llm = ChatOllama(
-    model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-    base_url    = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+    model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+    base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
     temperature = 0,
 )
 
@@ -37,7 +37,7 @@ def get_weather(city: str) -> str:
 SYSTEM = "You are a helpful weather assistant."
 
 # read_file is simply not in the list → both payloads fail (ASI02 prevention).
-agent = create_react_agent(llm, tools=[get_weather], prompt=SYSTEM)
+agent = create_react_agent(llm, tools = [get_weather], prompt = SYSTEM)
 
 
 if __name__ == "__main__":

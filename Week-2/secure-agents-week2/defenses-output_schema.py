@@ -20,10 +20,10 @@ init_tracing("week2-defenses-output_schema")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=OLLAMA_HOST, temperature=0)
-spec = ChatOllama(model=os.environ.get("SPECIALIST_MODEL", "llama3.2:3b"),
-                  base_url=OLLAMA_HOST, temperature=0)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = OLLAMA_HOST, temperature = 0)
+spec = ChatOllama(model = os.environ.get("SPECIALIST_MODEL", "llama3.2:3b"),
+                  base_url = OLLAMA_HOST, temperature = 0)
 
 
 class Research(BaseModel):
@@ -75,8 +75,8 @@ def researcher(state: MessagesState):
 
     # Read the raw (poisoned) document, then force it through the Research schema.
     request = state["messages"][-1].content.lower()
-    topic = "wind" if "wind" in request else "solar"
-    raw = fetch_doc.invoke({"topic": topic})
+    topic   = "wind" if "wind" in request else "solar"
+    raw     = fetch_doc.invoke({"topic": topic})
 
     research: Research = structured_spec.invoke(
         "Extract the topic, a list of factual findings (short bullet facts only), and the "
@@ -89,11 +89,11 @@ def researcher(state: MessagesState):
     # still filtered, so the typed channel keeps its guarantee.
     if research is None:
         print('\033[95m', "structured output failed to parse — using deterministic fallback")
-        research = Research(topic=topic, findings=_facts_from(raw),
-                            source=f"workspace/corpus/{topic}.txt")
+        research = Research(topic = topic, findings = _facts_from(raw),
+                            source = f"workspace/corpus/{topic}.txt")
 
     # Hand the supervisor the TYPED fields as a clean, prose-free channel.
-    facts = "\n".join(f"- {fact}" for fact in (research.findings or []))
+    facts   = "\n".join(f"- {fact}" for fact in (research.findings or []))
     summary = f"topic: {research.topic}\nsource: {research.source}\nfindings:\n{facts}"
     return {"messages": [("assistant", summary)]}
 

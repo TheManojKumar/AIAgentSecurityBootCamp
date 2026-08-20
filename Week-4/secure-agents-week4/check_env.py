@@ -13,7 +13,7 @@ PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006"
 
 def main():
     try:
-        with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout=10) as r:
+        with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout = 10) as r:
             names = {m["name"] for m in json.loads(r.read()).get("models", [])}
         assert any(n.startswith(ORCH.split(":")[0]) for n in names)
         print(f"\u2705 Ollama reachable at {OLLAMA_HOST}")
@@ -24,7 +24,7 @@ def main():
     # Docker-in-the-loop: can the agent container reach a Docker daemon?
     if shutil.which("docker"):
         try:
-            subprocess.run(["docker", "info"], capture_output=True, timeout=15, check=True)
+            subprocess.run(["docker", "info"], capture_output = True, timeout = 15, check = True)
             print("\u2705 Docker-in-the-loop available")
         except Exception:
             print("\u26a0\ufe0f  docker CLI present but daemon unreachable "
@@ -34,7 +34,7 @@ def main():
         sys.exit(1)
 
     try:
-        urllib.request.urlopen(PHOENIX, timeout=5)
+        urllib.request.urlopen(PHOENIX, timeout = 5)
         print(f"\u2705 Phoenix up at {PHOENIX}")
     except Exception:
         print(f"\u26a0\ufe0f  Phoenix not reachable at {PHOENIX}")

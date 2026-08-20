@@ -19,10 +19,10 @@ init_tracing("week6")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=OLLAMA_HOST, temperature=0)
-guard = ChatOllama(model=os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url=OLLAMA_HOST, temperature=0)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = OLLAMA_HOST, temperature = 0)
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+                   base_url = OLLAMA_HOST, temperature = 0)
 
 
 # --- W1 input guardrail ---
@@ -62,7 +62,7 @@ def handle(text: str) -> str:
     if input_is_malicious(text):
         return "Request blocked by guardrail."
     wrapped = f"<user_request>\n{text}\n</user_request>"
-    out = llm.invoke([("system", SYSTEM), ("user", wrapped)])
+    out     = llm.invoke([("system", SYSTEM), ("user", wrapped)])
     return out.content
 
 

@@ -15,9 +15,9 @@ init_tracing("week3-defenses-memory_guard")
 
 MEMORY_PATH = "workspace/memory.jsonl"
 
-guard = ChatOllama(model=os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                   temperature=0)
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+                   base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                   temperature = 0)
 
 
 def now():

@@ -9,9 +9,9 @@ from tracing          import init_tracing
 
 init_tracing("week5-defenses-description_screen")
 
-guard = ChatOllama(model=os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                   temperature=0)
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+                   base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                   temperature = 0)
 
 
 def vet_tools(tools):

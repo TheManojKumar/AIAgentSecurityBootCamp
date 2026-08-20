@@ -9,13 +9,13 @@ from tracing     import init_tracing
 init_tracing("week6-defenses-behavior_monitor")
 
 EXPECTED_TOOLS = {"add_note", "search_notes", "fetch_doc", "run_math"}
-DRIFT_SIGNALS = ("access: omega", "pre-authorized admin", "skip all approval")
+DRIFT_SIGNALS  = ("access: omega", "pre-authorized admin", "skip all approval")
 
 
 @dataclass
 class BehaviorMonitor:
     baseline_role: str = "assistant"
-    tool_calls: list = field(default_factory=list)
+    tool_calls: list = field(default_factory = list)
     halted: bool = False
 
     def check_tool_call(self, name: str) -> bool:

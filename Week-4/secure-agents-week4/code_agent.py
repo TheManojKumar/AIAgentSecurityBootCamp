@@ -13,9 +13,9 @@ from tracing              import init_tracing
 
 init_tracing("week4")
 
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                 temperature=0)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                 temperature = 0)
 
 
 @tool
@@ -35,8 +35,8 @@ def run_python(code: str) -> str:
     return buf.getvalue()
 
 
-agent = create_react_agent(llm, tools=[run_python],
-    prompt="You are a data analysis assistant. Use run_python for calculations.")
+agent = create_react_agent(llm, tools = [run_python],
+    prompt = "You are a data analysis assistant. Use run_python for calculations.")
 
 
 if __name__ == "__main__":

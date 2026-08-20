@@ -19,8 +19,8 @@ init_tracing("week5-hardened")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
-guard = ChatOllama(model=os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url=OLLAMA_HOST, temperature=0)
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+                   base_url = OLLAMA_HOST, temperature = 0)
 
 # --- Layer 3: only vetted, pinned servers are even eligible to connect ---
 MANIFEST = {"notes": {"expected_tools": {"add_note", "search_notes"}}}
@@ -82,7 +82,7 @@ async def main(user_msg):
     print('\033[92m', "Calling main ...")
     print('\033[92m', "=================================================================")
 
-    client = MultiServerMCPClient(SERVERS)
+    client    = MultiServerMCPClient(SERVERS)
     all_tools = await client.get_tools()
 
     safe = []
@@ -96,9 +96,9 @@ async def main(user_msg):
             continue
         safe.append(t)
 
-    llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                     base_url=OLLAMA_HOST, temperature=0)
-    agent = create_react_agent(llm, tools=safe, prompt="You are a notes assistant.")
+    llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                     base_url = OLLAMA_HOST, temperature = 0)
+    agent  = create_react_agent(llm, tools = safe, prompt = "You are a notes assistant.")
     result = await agent.ainvoke({"messages": [("user", user_msg)]})
 
     # Print the output message in Cyan color

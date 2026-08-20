@@ -24,7 +24,7 @@ def _try_base64(s: str) -> str:
         # only decode long-ish base64-looking runs
         for m in re.findall(r"[A-Za-z0-9+/]{16,}={0,2}", s):
             try:
-                dec = base64.b64decode(m, validate=True).decode("utf-8", "ignore")
+                dec = base64.b64decode(m, validate = True).decode("utf-8", "ignore")
                 if dec.isprintable():
                     s += " " + dec
             except (binascii.Error, ValueError):

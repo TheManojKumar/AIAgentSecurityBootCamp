@@ -19,13 +19,13 @@ init_tracing("week1-hardened")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
 llm = ChatOllama(
-    model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-    base_url    = OLLAMA_HOST,
+    model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+    base_url = OLLAMA_HOST,
     temperature = 0,
 )
 guard = ChatOllama(
-    model       = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-    base_url    = OLLAMA_HOST,
+    model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+    base_url = OLLAMA_HOST,
     temperature = 0,
 )
 
@@ -72,7 +72,7 @@ SYSTEM = (
 # --- Layer 1: least agency. read_file is included ONLY to demonstrate that even
 # an exposed sensitive tool is contained by Layers 2-4. For a pure weather
 # assistant you would omit it entirely (tools=[get_weather]).
-agent = create_react_agent(llm, tools=[get_weather, read_file], prompt=SYSTEM)
+agent = create_react_agent(llm, tools = [get_weather, read_file], prompt = SYSTEM)
 
 
 # --- Layer 4: guardrail screens input before the agent sees it ---

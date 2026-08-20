@@ -12,9 +12,9 @@ TARGET = "http://localhost:8000/"
 
 def send(prompt: str) -> str:
     payload = json.dumps({"prompt": prompt}).encode()
-    req = urllib.request.Request(TARGET, data=payload,
-                                 headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
+    req = urllib.request.Request(TARGET, data = payload,
+                                 headers = {"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout = 120) as r:
         return json.loads(r.read()).get("response", "")
 
 

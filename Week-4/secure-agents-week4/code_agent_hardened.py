@@ -33,7 +33,7 @@ def sandboxed_exec(code: str) -> str:
         "--memory", "256m", "--cpus", "0.5",
         "--security-opt", "no-new-privileges",
         "python:3.12-slim", "timeout", "5", "python", "-"
-    ], input=code, capture_output=True, text=True, timeout=15)
+    ], input = code, capture_output = True, text = True, timeout = 15)
     return (out.stdout or "") + (out.stderr or "")
 
 
@@ -48,7 +48,7 @@ def docker_available() -> bool:
     if not shutil.which("docker"):
         return False
     try:
-        subprocess.run(["docker", "info"], capture_output=True, timeout=10, check=True)
+        subprocess.run(["docker", "info"], capture_output = True, timeout = 10, check = True)
         return True
     except Exception:
         return False

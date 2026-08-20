@@ -21,21 +21,21 @@ init_tracing("week3-hardened")
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 MEMORY_PATH = "workspace/memory.jsonl"
 
-emb = OllamaEmbeddings(model=os.environ.get("EMBED_MODEL", "all-minilm"), base_url=OLLAMA_HOST)
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=OLLAMA_HOST, temperature=0)
-guard = ChatOllama(model=os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url=OLLAMA_HOST, temperature=0)
+emb = OllamaEmbeddings(model = os.environ.get("EMBED_MODEL", "all-minilm"), base_url = OLLAMA_HOST)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = OLLAMA_HOST, temperature = 0)
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
+                   base_url = OLLAMA_HOST, temperature = 0)
 
-client = chromadb.PersistentClient(path="workspace/chroma")
-col = client.get_or_create_collection("policies")
+client = chromadb.PersistentClient(path = "workspace/chroma")
+col    = client.get_or_create_collection("policies")
 
 INJECTION_SIGNALS = ("ignore older", "ignore previous", "authoritative policy",
                      "must first call", "official update", "skip all approval")
 
 
 # --- Layer 1: provenance-aware ingestion ---
-def add_document(doc, doc_id, source="untrusted", ingested_by="system"):
+def add_document(doc, doc_id, source = "untrusted", ingested_by = "system"):
 
     # Log this function call in Red color
     print('\033[31m', "=================================================================")
@@ -43,21 +43,21 @@ def add_document(doc, doc_id, source="untrusted", ingested_by="system"):
     print('\033[31m', "=================================================================")
 
     h = hashlib.sha256(doc.encode()).hexdigest()
-    col.upsert(documents=[doc], embeddings=[emb.embed_query(doc)],
-               metadatas=[{"source": source, "ingested_by": ingested_by, "sha256": h}],
-               ids=[doc_id])
+    col.upsert(documents = [doc], embeddings = [emb.embed_query(doc)],
+               metadatas = [{"source": source, "ingested_by": ingested_by, "sha256": h}],
+               ids = [doc_id])
 
 
 # --- Layer 1 + Layer 4: trusted retrieval with contradiction re-ranking ---
-def retrieve(query, k=3):
+def retrieve(query, k = 3):
 
     # Log this function call in Red color
     print('\033[31m', "=================================================================")
     print('\033[31m', "Calling retrieve with query: " + query)
     print('\033[31m', "=================================================================")
 
-    res = col.query(query_embeddings=[emb.embed_query(query)], n_results=max(k, 5),
-                    include=["documents", "metadatas", "distances"])
+    res = col.query(query_embeddings = [emb.embed_query(query)], n_results = max(k, 5),
+                    include = ["documents", "metadatas", "distances"])
     docs = []
     for text, meta, dist in zip(res["documents"][0], res["metadatas"][0], res["distances"][0]):
         docs.append({"text": text, "source": (meta or {}).get("source", "untrusted"),
@@ -71,7 +71,7 @@ def retrieve(query, k=3):
             s -= 1.0
         return s
 
-    ranked = sorted(docs, key=score, reverse=True)
+    ranked = sorted(docs, key = score, reverse = True)
     official = [d for d in ranked if d["source"] == "official"]
     others = [d for d in ranked if d["source"] != "official"]
     return official[:k], others[:k]

@@ -22,9 +22,9 @@ from tracing              import init_tracing
 
 init_tracing("week4-defenses-hitl")
 
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                 temperature=0)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                 temperature = 0)
 
 
 # --- Layer 1 (inlined): sandboxed execution ---
@@ -37,7 +37,7 @@ def sandboxed_exec(code: str) -> str:
         "--memory", "256m", "--cpus", "0.5",
         "--security-opt", "no-new-privileges",
         "python:3.12-slim", "timeout", "5", "python", "-"
-    ], input=code, capture_output=True, text=True, timeout=15)
+    ], input = code, capture_output = True, text = True, timeout = 15)
     return (out.stdout or "") + (out.stderr or "")
 
 

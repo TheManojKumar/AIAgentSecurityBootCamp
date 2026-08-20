@@ -15,7 +15,7 @@ ESCALATION_MARKERS = ("ignore your", "for the audit", "pre-authorized",
 
 @dataclass
 class TurnMonitor:
-    history: list = field(default_factory=list)
+    history: list = field(default_factory = list)
     suspicion: int = 0
 
     def observe(self, user_text: str) -> bool:

@@ -31,11 +31,11 @@ async def main(user_msg):
     print('\033[92m', "=================================================================")
 
     client = MultiServerMCPClient(SERVERS)
-    tools = await client.get_tools()      # tool names + DESCRIPTIONS enter the context here
-    llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                     base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                     temperature=0)
-    agent = create_react_agent(llm, tools=tools, prompt="You are a notes assistant.")
+    tools  = await client.get_tools()      # tool names + DESCRIPTIONS enter the context here
+    llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                     base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                     temperature = 0)
+    agent  = create_react_agent(llm, tools = tools, prompt = "You are a notes assistant.")
     result = await agent.ainvoke({"messages": [("user", user_msg)]})
 
     # Print the output message in Cyan color

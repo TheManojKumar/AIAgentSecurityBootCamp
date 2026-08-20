@@ -10,8 +10,8 @@ from tracing          import init_tracing
 init_tracing("week1-defenses-guardrail")
 
 guard = ChatOllama(
-    model       = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-    base_url    = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+    model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+    base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
     temperature = 0,
 )
 

@@ -44,7 +44,7 @@ def rerank(docs: list[dict]) -> list[dict]:
     print('\033[92m', "Calling rerank")
     print('\033[92m', "=================================================================")
 
-    return sorted(docs, key=score, reverse=True)
+    return sorted(docs, key = score, reverse = True)
 
 
 if __name__ == "__main__":

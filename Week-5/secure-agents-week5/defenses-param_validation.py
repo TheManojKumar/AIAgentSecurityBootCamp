@@ -30,5 +30,5 @@ def safe_ping(host: str) -> str:
     print('\033[95m', "Validation verdict: ALLOWED")
 
     # argv list, shell=False — the value can never be interpreted as a command
-    out = subprocess.run(["echo", "pinging", host], capture_output=True, text=True)
+    out = subprocess.run(["echo", "pinging", host], capture_output = True, text = True)
     return out.stdout

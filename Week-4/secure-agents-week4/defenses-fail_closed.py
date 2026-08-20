@@ -18,9 +18,9 @@ from tracing              import init_tracing
 
 init_tracing("week4-defenses-fail_closed")
 
-llm = ChatOllama(model=os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url=os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
-                 temperature=0)
+llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
+                 base_url = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434"),
+                 temperature = 0)
 
 
 # --- Layer 1 (inlined): sandboxed execution ---
@@ -33,7 +33,7 @@ def sandboxed_exec(code: str) -> str:
         "--memory", "256m", "--cpus", "0.5",
         "--security-opt", "no-new-privileges",
         "python:3.12-slim", "timeout", "5", "python", "-"
-    ], input=code, capture_output=True, text=True, timeout=15)
+    ], input = code, capture_output = True, text = True, timeout = 15)
     return (out.stdout or "") + (out.stderr or "")
 
 
@@ -47,7 +47,7 @@ def docker_available() -> bool:
     if not shutil.which("docker"):
         return False
     try:
-        subprocess.run(["docker", "info"], capture_output=True, timeout=10, check=True)
+        subprocess.run(["docker", "info"], capture_output = True, timeout = 10, check = True)
         return True
     except Exception:
         return False
@@ -71,8 +71,8 @@ def run_python(code: str) -> str:
     return sandboxed_exec(code)
 
 
-agent = create_react_agent(llm, tools=[run_python],
-    prompt="You are a data analysis assistant. Use run_python for calculations.")
+agent = create_react_agent(llm, tools = [run_python],
+    prompt = "You are a data analysis assistant. Use run_python for calculations.")
 
 
 if __name__ == "__main__":

@@ -6,8 +6,8 @@ import importlib.util
 import urllib.request
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-ORCH = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
-PHOENIX = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006")
+ORCH        = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b")
+PHOENIX     = os.environ.get("PHOENIX_COLLECTOR_ENDPOINT", "http://phoenix:6006")
 
 
 def has(mod):
@@ -16,7 +16,7 @@ def has(mod):
 
 def main():
     try:
-        with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout=10) as r:
+        with urllib.request.urlopen(f"{OLLAMA_HOST}/api/tags", timeout = 10) as r:
             names = {m["name"] for m in json.loads(r.read()).get("models", [])}
         assert any(n.startswith(ORCH.split(":")[0]) for n in names)
         print(f"\u2705 Ollama reachable at {OLLAMA_HOST}")
@@ -32,7 +32,7 @@ def main():
             sys.exit(1)
 
     try:
-        urllib.request.urlopen(PHOENIX, timeout=5)
+        urllib.request.urlopen(PHOENIX, timeout = 5)
         print(f"\u2705 Phoenix up at {PHOENIX}")
     except Exception:
         print(f"\u26a0\ufe0f  Phoenix not reachable at {PHOENIX}")

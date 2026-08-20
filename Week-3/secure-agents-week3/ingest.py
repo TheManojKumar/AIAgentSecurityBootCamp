@@ -13,15 +13,15 @@ from tracing          import init_tracing
 init_tracing("week3")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
-CORPUS = "workspace/corpus"
+CORPUS      = "workspace/corpus"
 
-emb = OllamaEmbeddings(model=os.environ.get("EMBED_MODEL", "all-minilm"),
-                       base_url=OLLAMA_HOST)
-client = chromadb.PersistentClient(path="workspace/chroma")
-col = client.get_or_create_collection("policies")
+emb = OllamaEmbeddings(model = os.environ.get("EMBED_MODEL", "all-minilm"),
+                       base_url = OLLAMA_HOST)
+client = chromadb.PersistentClient(path = "workspace/chroma")
+col    = client.get_or_create_collection("policies")
 
 
-def ingest(extra_paths=None):
+def ingest(extra_paths = None):
 
     # Log this function call in Red color
     print('\033[31m', "=================================================================")
@@ -34,7 +34,7 @@ def ingest(extra_paths=None):
     for path in paths:
         doc_id = os.path.basename(path)
         text = open(path).read()
-        col.upsert(documents=[text], embeddings=[emb.embed_query(text)], ids=[doc_id])
+        col.upsert(documents = [text], embeddings = [emb.embed_query(text)], ids = [doc_id])
         print(f"ingested {doc_id}")
 
     # Print the output message in Cyan color
@@ -51,4 +51,4 @@ if __name__ == "__main__":
     # Usage:  python ingest.py                     (rebuild from workspace/corpus)
     #         python ingest.py --add <path> [...]  (also ingest files by path)
     extra = sys.argv[2:] if len(sys.argv) > 1 and sys.argv[1] == "--add" else []
-    ingest(extra_paths=extra)
+    ingest(extra_paths = extra)
