@@ -144,8 +144,14 @@ That second sentence is ordinary, helpful, and present in some form in most real
 **Why the request is phrased in two steps.** A small orchestrator tends to make one tool call and then answer. A one-step question spends that call on the obvious search and stops, so the injected instruction never gets acted on. A two-step request keeps the agent working long enough to obey it. Worth saying out loud: a model too weak to chain tool calls is *accidentally* safe, not secure. Raise `ORCHESTRATOR_MODEL` to `qwen2.5:7b` and one-step requests fall to the same attack.
 
 **Second vector — STDIO command injection (`attacks/stdio_cmd_injection.md`):** a malicious server that takes a parameter and spawns a host command (the 2026 OX Security class). A crafted parameter executes `id` on the server process.
+```powershell
+# Windows PowerShell
+$payload = (Select-String -Path attacks/stdio_cmd_injection.md -Pattern '^PAYLOAD: ' | Select-Object -First 1).Line -replace '^PAYLOAD: ', ''
+docker compose run --rm agent python mcp_agent.py "Use ping_host to check if $payload is reachable."
+```
 ```bash
-docker compose run --rm agent python mcp_agent.py "Use ping_host to check if $(cat attacks/stdio_cmd_injection.md | sed -n 's/^PAYLOAD: //p') is reachable."
+# Linux / macOS
+docker compose run --rm agent python mcp_agent.py "Use ping_host to check if $(sed -n 's/^PAYLOAD: //p' attacks/stdio_cmd_injection.md) is reachable."
 ```
 The model calls `ping_host` with the crafted host; on the malicious server that value reaches a shell — `id` runs on the server process.
 
@@ -202,9 +208,16 @@ docker compose run --rm agent python defenses-server_vetting.py "Save a note: ca
 
 ### Layer 4 — Parameter validation & no shell / STDIO injection fix (`defenses-param_validation.py`)
 Never pass agent/model-supplied params into a shell; validate and use `subprocess` arg lists, not `shell=True`.
-```bash
-docker compose run --rm agent python defenses-param_validation.py "$(cat attacks/stdio_cmd_injection.md | sed -n 's/^PAYLOAD: //p')"
+```powershell
+# Windows PowerShell
+$payload = (Select-String -Path attacks/stdio_cmd_injection.md -Pattern '^PAYLOAD: ' | Select-Object -First 1).Line -replace '^PAYLOAD: ', ''
+docker compose run --rm agent python defenses-param_validation.py "$payload"
 ```
+```bash
+# Linux / macOS
+docker compose run --rm agent python defenses-param_validation.py "$(sed -n 's/^PAYLOAD: //p' attacks/stdio_cmd_injection.md)"
+```
+PowerShell has no `sed`. If you paste the Linux form into PowerShell the substitution yields an empty string, the script is handed no host at all, and you get `DENIED (invalid host)` — which looks like a pass but never exercised the payload.
 → The crafted parameter is treated as a literal string, not a command.
 
 ---

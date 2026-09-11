@@ -36,7 +36,10 @@ def safe_ping(host: str) -> str:
 
 
 if __name__ == "__main__":
-    host = sys.argv[1] if len(sys.argv) > 1 else "localhost; id"
+    # An empty argument means the caller's payload extraction produced nothing —
+    # fall back to the payload rather than "validating" an empty string and
+    # reporting DENIED, which reads like a pass but tests nothing.
+    host = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1].strip() else "localhost; id"
 
     # Log this function call in Yellow color
     print('\033[33m', "=================================================================")
