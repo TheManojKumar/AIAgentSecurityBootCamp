@@ -4,6 +4,7 @@
 # use a subprocess argv list (shell=False). The crafted "localhost; id" is then
 # a literal argument, not a command.
 import re
+import sys
 import subprocess
 from tracing import init_tracing
 
@@ -32,3 +33,17 @@ def safe_ping(host: str) -> str:
     # argv list, shell=False — the value can never be interpreted as a command
     out = subprocess.run(["echo", "pinging", host], capture_output = True, text = True)
     return out.stdout
+
+
+if __name__ == "__main__":
+    host = sys.argv[1] if len(sys.argv) > 1 else "localhost; id"
+
+    # Log this function call in Yellow color
+    print('\033[33m', "=================================================================")
+    print('\033[33m', "Running defenses-param_validation with host: " + host)
+    print('\033[33m', "=================================================================")
+
+    result = safe_ping(host)
+
+    # Print the output message in Cyan color
+    print('\033[96m', result)

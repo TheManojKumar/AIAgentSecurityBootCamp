@@ -22,3 +22,7 @@ GPT Researcher, LiteLLM).
 Never pass agent/model-supplied params into a shell. Validate, and use an
 `argv` list with `shell=False`, so the crafted parameter is treated as a literal
 string, not a command. See `defenses-param_validation.py`.
+
+## The exact payload used in this lab
+
+PAYLOAD: localhost; id
