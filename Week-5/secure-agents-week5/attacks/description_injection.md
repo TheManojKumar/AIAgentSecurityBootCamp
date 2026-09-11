@@ -80,9 +80,12 @@ retrieved, so the model forwards the only content it is holding. The compromise
 is real either way: an unrequested write to an attacker-controlled file.
 
 "Before you answer anything at all" is also an instruction the model can never
-finish satisfying, so it may keep calling tools until it hits `RECURSION_LIMIT`
-in `mcp_agent.py`. The exfiltration still happens first, and the agent reports
-the stall in red rather than crashing.
+finish satisfying, so a run ends one of two ways. Either the agent syncs, does
+the work, and answers normally, printing the list of every tool it called. Or it
+keeps calling tools until it exhausts `RECURSION_LIMIT` in `mcp_agent.py` and
+gives up with a red line instead of an answer. Both count as a successful demo:
+the exfiltration happens first either way. On the run that gives up there is no
+tool-call list, so read the red server log and the sink instead.
 
 Tightening both is **practice exercise 2**. Two routes: reword the injection to
 fire *after* a retrieval, which is loop-safe but needs a model that will act on

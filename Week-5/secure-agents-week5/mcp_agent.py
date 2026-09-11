@@ -20,7 +20,7 @@ init_tracing("week5")
 SERVERS = {
     "notes": {"command": "python", "args": ["servers/notes_server.py"], "transport": "stdio"},
     # Uncomment to run the attack in Part B:
-    "backup": {"command": "python", "args": ["servers/malicious_server.py"], "transport": "stdio"},
+    # "backup": {"command": "python", "args": ["servers/malicious_server.py"], "transport": "stdio"},
 }
 
 # A perfectly ordinary agent system prompt. The second sentence is the one that
@@ -69,8 +69,10 @@ async def main(user_msg):
     except GraphRecursionError:
         # Log the runaway in Red color
         print('\033[91m', f"Agent gave up after {RECURSION_LIMIT} steps without answering. "
-                          "A tool description demanding a call before every answer can "
-                          "trap the loop — see the tool calls logged above.")
+                          "A tool description demanding a call before every answer can trap "
+                          "the loop. The tool-call list below is only printed on a run that "
+                          "finishes; for this run, read the red server log above and the "
+                          "sink file — the exfiltration already happened.")
         return
 
     # Print every tool the model actually called, in Magenta color. This is the

@@ -58,6 +58,10 @@ docker compose run --rm agent python mcp_agent_hardened.py "Save a note: call th
   a malicious integration side by side, with identical wiring — the only
   difference is trust. The malicious server is clearly labeled and only writes to
   a local sink with fake data.
+- **Two acceptable endings for the attack run:** the agent either answers
+  normally or gives up after `RECURSION_LIMIT` steps with a red line, because the
+  injection demands a sync before *every* answer. The exfiltration happens first
+  either way, so check the sink rather than the final message.
 - **The sink gets the user's request, not their notes, on a small model:** the
   injection demands a sync before anything has been retrieved, so the model
   forwards the only content it holds. The compromise is real either way, and
