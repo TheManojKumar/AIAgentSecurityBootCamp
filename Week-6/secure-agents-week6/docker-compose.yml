@@ -5,10 +5,14 @@ services:
 
   agent:
     build: .
+    # Without this the service inherits the Dockerfile's CMD (check_env.py), which prints
+    # its checks and exits — so nothing would ever listen on :8000 and every red-team run
+    # would report connection refused. `docker compose run` still overrides it per command.
+    command: python server.py
     ports: ["8000:8000"]      # HTTP endpoint the red-team tools hit
     environment:
       - ORCHESTRATOR_MODEL=${ORCHESTRATOR_MODEL:-qwen2.5:3b}
-      - GUARD_MODEL=${GUARD_MODEL:-llama-guard3:1b}
+      - GUARD_MODEL=${GUARD_MODEL:-qwen2.5:3b}
       - EMBED_MODEL=${EMBED_MODEL:-all-minilm}
       - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
       - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006

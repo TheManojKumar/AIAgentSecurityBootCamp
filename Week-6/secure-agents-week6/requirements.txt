@@ -1,14 +1,23 @@
+# CPU-only torch: garak requires torch, and the default PyPI wheel drags in the
+# whole CUDA stack (cuda-toolkit, cudnn, nccl, triton) for several extra GB that
+# nothing in this lab uses. The +cpu local version can only match this index.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.9.1+cpu
+
 langgraph==0.2.74
 langchain-ollama==0.2.3
-langchain-core==0.3.40
-langchain-mcp-adapters==0.0.9
-mcp==1.2.0
-chromadb==0.5.23
+langchain-core==0.3.86
+langchain==0.3.30
 langchain-community==0.3.16
-pydantic==2.10.6
 arize-phoenix-otel
 openinference-instrumentation-langchain==0.1.34
 wrapt<2.0.0
-garak==0.10.1
-deepteam==0.1.4
+garak==0.11.0
+deepteam==1.0.9
+# deepteam 1.0.9's telemetry module imports sentry_sdk and posthog at module
+# level but declares neither, so `import deepteam` fails without them. They are
+# inert here: DEEPTEAM_TELEMETRY_OPT_OUT is set before the import in
+# redteam/run_deepteam.py.
+sentry-sdk
+posthog
 pyrit==0.6.0

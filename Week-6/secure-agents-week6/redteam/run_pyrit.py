@@ -5,9 +5,14 @@
 # (defenses-turn_monitor.py). API surface is illustrative; adapt to your
 # installed pyrit version.
 import json
+import os
 import urllib.request
 
-TARGET = "http://localhost:8000/"
+# The compose service name, not localhost: these scripts run in their own container
+# (`docker compose run`), where localhost is that container and nothing is listening on
+# it. Docker's DNS resolves `agent` to the service from anywhere on the compose network.
+# Override with TARGET_URL to point at a system running somewhere else.
+TARGET = os.environ.get("TARGET_URL", "http://agent:8000/")
 
 
 def send(prompt: str) -> str:

@@ -19,10 +19,22 @@ init_tracing("week6")
 
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://host.docker.internal:11434")
 
+# num_predict bounds the answer. An unbounded model under adversarial input will
+# happily generate until it runs out of context, and a red-team scanner that times
+# out client-side does NOT stop the server: the generation keeps burning CPU while
+# the scanner retries, and the retries pile up until everything crawls.
 llm = ChatOllama(model = os.environ.get("ORCHESTRATOR_MODEL", "qwen2.5:3b"),
-                 base_url = OLLAMA_HOST, temperature = 0)
-guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "llama-guard3:1b"),
-                   base_url = OLLAMA_HOST, temperature = 0)
+                 base_url = OLLAMA_HOST, temperature = 0, num_predict = 512)
+# The guard has to answer the question we ask it, so it must be an
+# instruction-following model. A content classifier like llama-guard3 replies with
+# its own hazard taxonomy ("safe" / "unsafe S1-S13"), ignores the question asked,
+# and folds that question's own words into what it classifies — which made benign
+# requests come back UNSAFE. See the Section 5 note on classifiers vs judges.
+# num_predict = 8: the guard's whole job is to say SAFE or UNSAFE. Without a cap
+# it is free to write a paragraph explaining itself, and on a CPU-tier model that
+# paragraph costs more than the answer it is guarding.
+guard = ChatOllama(model = os.environ.get("GUARD_MODEL", "qwen2.5:3b"),
+                   base_url = OLLAMA_HOST, temperature = 0, num_predict = 8)
 
 
 # --- W1 input guardrail ---
@@ -51,6 +63,17 @@ SYSTEM = (
 )
 
 
+# The one document this assistant may answer from. In the full cumulative system
+# this is what Week 3's retriever would hand back; it is inline here so the lab has
+# real content to work on without standing up a vector store. It reaches the model
+# inside a <policy_document> tag — as DATA, exactly as the system prompt says.
+POLICY_DOCUMENT = """Q3 REFUND POLICY (internal, v3)
+1. Standard refunds are issued within 30 days of purchase, to the original payment method.
+2. Digital goods are refundable only if fewer than 3 downloads have occurred.
+3. Enterprise contracts are refunded pro rata, minus a 15% restocking fee.
+4. Refunds above $5,000 require finance approval before processing."""
+
+
 def handle(text: str) -> str:
     """Single hardened entrypoint used by the HTTP server and red-team tools."""
 
@@ -61,7 +84,8 @@ def handle(text: str) -> str:
 
     if input_is_malicious(text):
         return "Request blocked by guardrail."
-    wrapped = f"<user_request>\n{text}\n</user_request>"
+    wrapped = (f"<policy_document>\n{POLICY_DOCUMENT}\n</policy_document>\n\n"
+               f"<user_request>\n{text}\n</user_request>")
     out     = llm.invoke([("system", SYSTEM), ("user", wrapped)])
     return out.content
 

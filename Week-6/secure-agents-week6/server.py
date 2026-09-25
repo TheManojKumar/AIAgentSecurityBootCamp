@@ -10,6 +10,13 @@ from tracing       import init_tracing
 
 init_tracing("week6-server")
 
+# What the target answers when it could not run the request at all. A red-team
+# target that drops the connection takes the whole scan down with it: garak sees
+# RemoteDisconnected, raises, and every probe still queued is lost. Answering is
+# always better than dying — the run continues and this string shows up in the
+# report, where it reads as "no answer", not as a leak.
+ERROR_RESPONSE = "[error] the system could not process this request."
+
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -25,7 +32,14 @@ class Handler(BaseHTTPRequestHandler):
             prompt = json.loads(body).get("prompt", "")
         except Exception:
             prompt = body
-        reply = handle(prompt)
+
+        try:
+            reply = handle(prompt)
+        except Exception as e:
+            # Log the failure in Red color — loudly, because a run full of these
+            # is a broken target, not a hardened one.
+            print('\033[91m', f"handle() failed on a {len(prompt)}-character prompt: {e}")
+            reply = ERROR_RESPONSE
 
         # Log the response to stdout in Cyan color (never written into the wire payload)
         print('\033[96m', reply)
