@@ -13,6 +13,9 @@ services:
     environment:
       - ORCHESTRATOR_MODEL=${ORCHESTRATOR_MODEL:-qwen2.5:3b}
       - GUARD_MODEL=${GUARD_MODEL:-qwen2.5:3b}
+      # Which system server.py puts behind :8000. Start with the bare cumulative
+      # system; switch to secure_system_final for the Section 3/4 re-run.
+      - SYSTEM_MODULE=${SYSTEM_MODULE:-secure_system}
       - EMBED_MODEL=${EMBED_MODEL:-all-minilm}
       - OLLAMA_HOST=${OLLAMA_HOST:-http://host.docker.internal:11434}
       - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006

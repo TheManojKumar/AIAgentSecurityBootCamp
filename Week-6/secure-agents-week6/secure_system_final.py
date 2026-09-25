@@ -94,10 +94,12 @@ def input_is_malicious(text: str) -> bool:
 
 
 class SecureSession:
-    """Stateful hardened session. One per conversation so the turn-level and
-    behavioral monitors can accumulate context across requests."""
+    """Stateful hardened session. One per conversation so the model remembers the
+    exchange AND the turn-level / behavioral monitors accumulate context across
+    requests — the monitors watch the same history the model answers from."""
 
     def __init__(self):
+        self.history  = []
         self.turns    = TurnMonitor()
         self.behavior = BehaviorMonitor()
 
@@ -117,22 +119,30 @@ class SecureSession:
         if self.turns.observe(text):
             return "Conversation halted for review (escalation pattern detected)."
 
-        wrapped = (f"<policy_document>\n{POLICY_DOCUMENT}\n</policy_document>\n\n"
-                   f"<user_request>\n{text}\n</user_request>")
-        out = llm.invoke([("system", SYSTEM), ("user", wrapped)]).content
+        wrapped  = (f"<policy_document>\n{POLICY_DOCUMENT}\n</policy_document>\n\n"
+                    f"<user_request>\n{text}\n</user_request>")
+        messages = [("system", SYSTEM)] + self.history + [("user", wrapped)]
+        out      = llm.invoke(messages).content
 
         # Layer 4 — behavioral kill-switch on the model's own output (role-drift)
         if not self.behavior.check_output(out):
             return "Response withheld: behavioral monitor detected role drift."
+        self.history += [("user", wrapped), ("assistant", out)]
         return out
 
 
-# Module-level default session so server.py's handle(text) keeps working.
-_default = SecureSession()
+# One SecureSession per session id. A caller that sends no id (garak, DeepTeam)
+# gets a fresh session per request, so one probe tripping a monitor can never
+# block the probes that follow it — that would read as a wall of false passes.
+_sessions: dict[str, SecureSession] = {}
 
 
-def handle(text: str) -> str:
-    return _default.handle(text)
+def handle(text: str, session_id: str = "") -> str:
+    if not session_id:
+        return SecureSession().handle(text)
+    if session_id not in _sessions:
+        _sessions[session_id] = SecureSession()
+    return _sessions[session_id].handle(text)
 
 
 if __name__ == "__main__":

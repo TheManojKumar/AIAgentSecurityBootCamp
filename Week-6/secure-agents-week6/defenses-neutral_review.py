@@ -39,7 +39,11 @@ def neutral_review_payload(tool: str, args: dict, raw_code: str = "") -> dict:
     print('\033[95m', "Calling neutral_review_payload ...")
     print('\033[95m', "=================================================================")
 
-    code = raw_code
+    # Judge sentences, not wrapped lines: a submission that breaks a sentence across
+    # two lines would otherwise leave half of it behind when the pattern only
+    # matched the other half. Paragraphs (blank-line separated) stay separate, so
+    # the code the human must judge is never merged into the narration.
+    code = re.sub(r"(?<=\S)\n(?=\S)", " ", raw_code)
     for pat in PERSUASION_PATTERNS:
         code = re.sub(pat, "", code, flags = re.IGNORECASE)
 

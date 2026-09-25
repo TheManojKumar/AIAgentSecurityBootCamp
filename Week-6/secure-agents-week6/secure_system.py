@@ -7,9 +7,9 @@
 #   W4 — sandboxed + human-gated code tool, fail-closed
 #   W5 — vetted/scoped MCP servers
 #
-# This module exposes a single handle(text) entrypoint that server.py serves
-# over HTTP so the red-team tools can hit it. The individual controls live in
-# their `defenses-*.py` modules; here we compose them behind one door.
+# This module exposes a single handle(text, session_id) entrypoint that server.py
+# serves over HTTP so the red-team tools can hit it. The individual controls live
+# in their `defenses-*.py` modules; here we compose them behind one door.
 import os
 import sys
 from langchain_ollama import ChatOllama
@@ -74,7 +74,15 @@ POLICY_DOCUMENT = """Q3 REFUND POLICY (internal, v3)
 4. Refunds above $5,000 require finance approval before processing."""
 
 
-def handle(text: str) -> str:
+# Conversation memory, one history per session id. This is what makes the system
+# a real multi-turn target: a caller that sends the same session id on every
+# request gets a conversation the model remembers, and a caller that sends none
+# (garak, DeepTeam) gets a fresh single-shot each time. The guardrail screens
+# each turn ON ITS OWN — which is exactly the gap PyRIT's escalation walks through.
+_histories: dict[str, list] = {}
+
+
+def handle(text: str, session_id: str = "") -> str:
     """Single hardened entrypoint used by the HTTP server and red-team tools."""
 
     # Log this function call in Green color
@@ -84,10 +92,13 @@ def handle(text: str) -> str:
 
     if input_is_malicious(text):
         return "Request blocked by guardrail."
-    wrapped = (f"<policy_document>\n{POLICY_DOCUMENT}\n</policy_document>\n\n"
-               f"<user_request>\n{text}\n</user_request>")
-    out     = llm.invoke([("system", SYSTEM), ("user", wrapped)])
-    return out.content
+    wrapped  = (f"<policy_document>\n{POLICY_DOCUMENT}\n</policy_document>\n\n"
+                f"<user_request>\n{text}\n</user_request>")
+    history  = _histories.setdefault(session_id, []) if session_id else []
+    messages = [("system", SYSTEM)] + history + [("user", wrapped)]
+    out      = llm.invoke(messages).content
+    history += [("user", wrapped), ("assistant", out)]
+    return out
 
 
 if __name__ == "__main__":

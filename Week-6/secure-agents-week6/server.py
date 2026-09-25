@@ -2,13 +2,23 @@
 #
 # Minimal, dependency-free HTTP server (stdlib) so Garak/DeepTeam/PyRIT can POST
 # a prompt and receive the system's response. POST / with {"prompt": "..."}.
+# Add {"session": "<any id>"} to keep a conversation going across requests —
+# the system then remembers earlier turns under that id. Leave it out and every
+# request is its own single-shot conversation (what garak and DeepTeam send).
+import importlib
 import json
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-from secure_system import handle
-from tracing       import init_tracing
+from tracing import init_tracing
 
 init_tracing("week6-server")
+
+# Which system stands behind :8000. The lab starts with the bare cumulative
+# system; once the Week-6 layers are written, point this at secure_system_final
+# to re-run the same attacks against the hardened one for the security delta.
+SYSTEM_MODULE = os.environ.get("SYSTEM_MODULE", "secure_system")
+handle        = importlib.import_module(SYSTEM_MODULE).handle
 
 # What the target answers when it could not run the request at all. A red-team
 # target that drops the connection takes the whole scan down with it: garak sees
@@ -29,12 +39,15 @@ class Handler(BaseHTTPRequestHandler):
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length).decode() if length else "{}"
         try:
-            prompt = json.loads(body).get("prompt", "")
+            request = json.loads(body)
+            prompt  = request.get("prompt", "")
+            session = str(request.get("session", ""))
         except Exception:
-            prompt = body
+            prompt  = body
+            session = ""
 
         try:
-            reply = handle(prompt)
+            reply = handle(prompt, session)
         except Exception as e:
             # Log the failure in Red color — loudly, because a run full of these
             # is a broken target, not a hardened one.
@@ -59,7 +72,7 @@ if __name__ == "__main__":
 
     # Log this function call in Yellow color
     print('\033[33m', "=================================================================")
-    print('\033[33m', "Running server on 0.0.0.0:8000 ...")
+    print('\033[33m', f"Running server on 0.0.0.0:8000 (serving {SYSTEM_MODULE}) ...")
     print('\033[33m', "=================================================================")
 
     ThreadingHTTPServer(("0.0.0.0", 8000), Handler).serve_forever()

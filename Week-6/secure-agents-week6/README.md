@@ -26,10 +26,11 @@ secure-agents-week6/
 │   ├── run_garak.sh              # encoding, promptinject, dan, leakage probes
 │   │                             #   $PROBES overrides the list; HijackLongPrompt is off
 │   ├── run_deepteam.py           # DeepTeam scan; attacker + judge models are local
-│   └── run_pyrit.py              # PyRIT multi-turn escalation orchestrator
+│   └── run_pyrit.py              # PyRIT-style escalation: single shot vs. conversation
 ├── attacks/
 │   ├── asi09_trust_exploit.txt   # persuasive framing to defeat the HITL reviewer
-│   └── asi10_rogue_drift.py      # induces role-drift / persisted directive
+│   ├── asi09_trust_exploit.py    # the HITL gate, put in front of you with that framing
+│   └── asi10_rogue_drift.py      # role-drift scenario, scripted read-along (no system contact)
 ├── defenses-normalize.py         # Layer 1 — decode encoded payloads before screening
 ├── defenses-turn_monitor.py      # Layer 2 — conversation-level escalation detection
 ├── defenses-neutral_review.py    # Layer 3 — strip persuasive framing before HITL (ASI09)
@@ -49,7 +50,8 @@ docker compose run --rm agent python check_env.py
 
 # 1. Stand the cumulative system up behind HTTP
 docker compose up -d
-#    (server.py serves secure_system.handle over POST / on :8000)
+#    (server.py serves secure_system.handle over POST / on :8000;
+#     SYSTEM_MODULE=secure_system_final swaps the hardened system in)
 docker compose run --rm agent curl -s -X POST http://agent:8000/ \
   -H "Content-Type: application/json" -d '{"prompt":"Summarize the Q3 refund policy."}'
 
@@ -97,6 +99,11 @@ docker compose exec agent python secure_system_final.py "Summarize the refund po
   model inside a `<policy_document>` tag alongside the user's request, so the data/instruction
   boundary is visible in the prompt. Ask about anything else and it will correctly say it has no
   context. In the full cumulative system this is what Week 3's retriever would return.
+- **The endpoint remembers a conversation.** POST `{"prompt": ..., "session": "<id>"}` and the system
+  keeps history under that id; leave `session` out and each request is a single shot (what garak and
+  DeepTeam send). `run_pyrit.py` uses one id for its three turns and none for its control shot — the
+  difference between those two answers is the finding. In `secure_system_final.py` the turn monitor
+  watches the same per-session history the model answers from.
 - **Each `defenses-*.py` runs on its own** and prints its own before/after; pass your own payload,
   turns, submission path or model reply as an argument.
 - **DeepTeam brings its own models.** Besides the target it needs a simulator (writes the
