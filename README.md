@@ -7,7 +7,7 @@
 - A practitioner course for learning, and then teaching to others, how to build multi-agent AI systems and secure them, entirely on local hardware.
 - Every week you **build** a working agent system, **attack** it with real exploits you run yourself, and **defend** it by layering controls until the same attack fails.
 - Everything runs offline against local models via Ollama; no cloud accounts, no API keys, no data leaving the machine.
-
+- YouTube Playlist with walkthrough for all 7 weeks: https://www.youtube.com/playlist?list=PLBsOiBsICCrs
 ---
 
 ## What's covered in 6-weeks
